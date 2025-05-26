@@ -1,0 +1,47 @@
+@{
+    ViewData["Title"] = "Video";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+        }
+        .video-fullscreen {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        video {
+            max-width: 100vw;
+            max-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div class="video-fullscreen">
+        <video src="/uploads/ronaldo.mp4" controls autoplay></video>
+    </div>
+    <div style="text-align:center; color:white; font-size:2rem; margin-top:24px;">
+        ja w srode na cwiczeniach z mo
+    </div>
+    <script>
+        // Wymuś odtwarzanie z dźwiękiem
+        const video = document.querySelector('video');
+        video.muted = false;
+        video.play();
+    </script>
+</body>
+</html>
+
