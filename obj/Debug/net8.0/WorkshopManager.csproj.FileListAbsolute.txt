@@ -334,3 +334,4 @@ C:\Users\Krzysztof\RiderProjects\projekt-dotnet\obj\Debug\net8.0\refint\Workshop
 C:\Users\Krzysztof\RiderProjects\projekt-dotnet\obj\Debug\net8.0\WorkshopManager.pdb
 C:\Users\Krzysztof\RiderProjects\projekt-dotnet\obj\Debug\net8.0\WorkshopManager.genruntimeconfig.cache
 C:\Users\Krzysztof\RiderProjects\projekt-dotnet\obj\Debug\net8.0\ref\WorkshopManager.dll
+C:\Users\Krzysztof\RiderProjects\projekt-dotnet\bin\Debug\net8.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
