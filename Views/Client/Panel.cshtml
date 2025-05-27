@@ -1,6 +1,81 @@
+@model IEnumerable<WorkshopManager.Models.Vehicle>
 @{
     ViewData["Title"] = "Panel klienta";
 }
 <h2>Panel klienta</h2>
-<p>Witaj w panelu klienta! Tutaj możesz zarządzać swoimi usługami i danymi.</p>
+<p>Witaj <strong>@ViewBag.FirstName @ViewBag.LastName</strong>!</p>
+<p>Tutaj możesz zarządzać swoimi usługami i danymi.</p>
+<a class="btn btn-success" href="/Vehicle/Add">Dodaj pojazd</a>
 
+@if (!Model.Any())
+{
+    <p>Brak pojazdów przypisanych do Twojego konta.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Marka</th>
+                <th>Model</th>
+                <th>VIN</th>
+                <th>Rejestracja</th>
+                <th>Rok produkcji</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var vehicle in Model)
+        {
+            <tr>
+                <td>@vehicle.Brand</td>
+                <td>@vehicle.Model</td>
+                <td>@vehicle.Vin</td>
+                <td>@vehicle.RegistrationNumber</td>
+                <td>@vehicle.Year</td>
+                <td>
+                    <a class="btn btn-primary" href="/ServiceOrder/Create?vehicleId=@vehicle.Id">Złóż zlecenie</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+<!-- Sekcja: Zlecone naprawy -->
+<h3>Zlecone naprawy</h3>
+@if (ViewBag.VehiclesWithActiveOrder != null && ((List<WorkshopManager.Models.Vehicle>)ViewBag.VehiclesWithActiveOrder).Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Marka</th>
+                <th>Model</th>
+                <th>VIN</th>
+                <th>Rejestracja</th>
+                <th>Rok produkcji</th>
+                <th>Status zlecenia</th>
+                <th>Opis problemu</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var vehicle in (List<WorkshopManager.Models.Vehicle>)ViewBag.VehiclesWithActiveOrder)
+        {
+            var order = ((List<WorkshopManager.Models.ServiceOrder>)ViewBag.ActiveOrders).FirstOrDefault(o => o.VehicleId == vehicle.Id);
+            <tr>
+                <td>@vehicle.Brand</td>
+                <td>@vehicle.Model</td>
+                <td>@vehicle.Vin</td>
+                <td>@vehicle.RegistrationNumber</td>
+                <td>@vehicle.Year</td>
+                <td>@order?.Status</td>
+                <td>@order?.ProblemDescription</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Brak pojazdów ze zleconą naprawą.</p>
+}

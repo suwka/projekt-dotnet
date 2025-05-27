@@ -1,0 +1,47 @@
+@model IEnumerable<WorkshopManager.Models.Vehicle>
+
+@{
+    ViewData["Title"] = "Twoje pojazdy";
+}
+
+<h2>Lista pojazdów</h2>
+
+@if (Model.Any())
+{
+    <h4>Twoje dodane pojazdy</h4>
+}
+
+@if (!Model.Any())
+{
+    <p>Brak pojazdów przypisanych do Twojego konta.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Marka</th>
+                <th>Model</th>
+                <th>VIN</th>
+                <th>Rejestracja</th>
+                <th>Rok produkcji</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var vehicle in Model)
+        {
+            <tr>
+                <td>@vehicle.Brand</td>
+                <td>@vehicle.Model</td>
+                <td>@vehicle.Vin</td>
+                <td>@vehicle.RegistrationNumber</td>
+                <td>@vehicle.Year</td>
+                <td>
+                    <a class="btn btn-primary" href="/ServiceOrder/Create?vehicleId=@vehicle.Id">Złóż zlecenie</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
