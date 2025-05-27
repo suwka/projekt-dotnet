@@ -30,8 +30,22 @@ namespace WorkshopManager.Controllers
                 return RedirectToAction("Index", "Home");
             ViewBag.FirstName = customer.FirstName;
             ViewBag.LastName = customer.LastName;
-            var vehicles = _context.Vehicles.Where(v => v.CustomerId == customer.Id).ToList();
-            return View(vehicles);
+
+            // Pobierz pojazdy klienta
+            var allVehicles = _context.Vehicles.Where(v => v.CustomerId == customer.Id).ToList();
+            // Pobierz aktywne zlecenia serwisowe (Nowe lub WTrakcie)
+            var activeOrders = _context.ServiceOrders
+                .Where(so => (so.Status == ServiceOrderStatus.Nowe || so.Status == ServiceOrderStatus.WTrakcie)
+                    && allVehicles.Select(v => v.Id).Contains(so.VehicleId))
+                .ToList();
+            // Pojazdy z aktywnym zleceniem
+            var vehiclesWithActiveOrder = allVehicles.Where(v => activeOrders.Any(so => so.VehicleId == v.Id)).ToList();
+            // Pojazdy bez aktywnego zlecenia
+            var vehiclesWithoutActiveOrder = allVehicles.Where(v => !vehiclesWithActiveOrder.Contains(v)).ToList();
+
+            ViewBag.VehiclesWithActiveOrder = vehiclesWithActiveOrder;
+            ViewBag.ActiveOrders = activeOrders;
+            return View(vehiclesWithoutActiveOrder);
         }
     }
 }
