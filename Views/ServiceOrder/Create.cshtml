@@ -1,0 +1,35 @@
+@model WorkshopManager.Models.ServiceOrder
+@{
+    ViewData["Title"] = "Nowe zlecenie serwisowe";
+}
+<h2>Nowe zlecenie serwisowe</h2>
+<form asp-action="Create" method="post">
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <ul>
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+    <input type="hidden" asp-for="VehicleId" />
+    <input type="hidden" asp-for="CreatedAt" />
+    <input type="hidden" asp-for="Status" />
+    <div class="form-group">
+        <label>Numer pojazdu: @Model.VehicleId</label>
+    </div>
+    <div class="form-group">
+        <label for="ProblemDescription">Opis problemu</label>
+        <textarea asp-for="ProblemDescription" class="form-control" rows="4" placeholder="Opisz co nie działa w samochodzie..."></textarea>
+        <span asp-validation-for="ProblemDescription" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Złóż zlecenie</button>
+    <a href="/Client/Panel" class="btn btn-secondary">Anuluj</a>
+</form>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

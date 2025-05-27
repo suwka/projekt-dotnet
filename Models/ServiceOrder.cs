@@ -22,23 +22,28 @@ namespace WorkshopManager.Models
         public ServiceOrderStatus Status { get; set; }
 
         // Mechanik przypisany do zlecenia
-        public string AssignedMechanicId { get; set; }
-        public IdentityUser AssignedMechanic { get; set; }
+        [StringLength(450)]
+        public string? AssignedMechanicId { get; set; }
+        public IdentityUser? AssignedMechanic { get; set; }
 
         // Powiązanie z pojazdem
         [Required]
         public int VehicleId { get; set; }
-        public Vehicle Vehicle { get; set; }
+        public Vehicle? Vehicle { get; set; }
 
         // Lista czynności serwisowych
-        public ICollection<ServiceTask> ServiceTasks { get; set; }
+        public ICollection<ServiceTask> ServiceTasks { get; set; } = new List<ServiceTask>();
 
         // Lista komentarzy
-        public ICollection<Comment> Comments { get; set; }
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
         [Required]
         public DateTime CreatedAt { get; set; }
         public DateTime? ClosedAt { get; set; }
+
+        [Required]
+        [MaxLength(1000)]
+        public string ProblemDescription { get; set; } = string.Empty;
     }
 }
 
