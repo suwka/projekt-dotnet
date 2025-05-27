@@ -249,7 +249,7 @@ namespace WorkshopManager.Migrations
 
                     b.HasIndex("ServiceOrderId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("WorkshopManager.Models.Customer", b =>
@@ -282,7 +282,7 @@ namespace WorkshopManager.Migrations
 
                     b.HasIndex("IdentityUserId");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("WorkshopManager.Models.Part", b =>
@@ -303,7 +303,7 @@ namespace WorkshopManager.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Parts");
+                    b.ToTable("Parts", (string)null);
                 });
 
             modelBuilder.Entity("WorkshopManager.Models.ServiceOrder", b =>
@@ -336,7 +336,7 @@ namespace WorkshopManager.Migrations
 
                     b.HasIndex("VehicleId");
 
-                    b.ToTable("ServiceOrders");
+                    b.ToTable("ServiceOrders", (string)null);
                 });
 
             modelBuilder.Entity("WorkshopManager.Models.ServiceTask", b =>
@@ -362,7 +362,7 @@ namespace WorkshopManager.Migrations
 
                     b.HasIndex("ServiceOrderId");
 
-                    b.ToTable("ServiceTasks");
+                    b.ToTable("ServiceTasks", (string)null);
                 });
 
             modelBuilder.Entity("WorkshopManager.Models.UsedPart", b =>
@@ -388,7 +388,7 @@ namespace WorkshopManager.Migrations
 
                     b.HasIndex("ServiceTaskId");
 
-                    b.ToTable("UsedParts");
+                    b.ToTable("UsedParts", (string)null);
                 });
 
             modelBuilder.Entity("WorkshopManager.Models.Vehicle", b =>
@@ -440,7 +440,7 @@ namespace WorkshopManager.Migrations
                     b.HasIndex("Vin")
                         .IsUnique();
 
-                    b.ToTable("Vehicles");
+                    b.ToTable("Vehicles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
