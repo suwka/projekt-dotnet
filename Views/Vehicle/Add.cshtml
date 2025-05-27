@@ -1,0 +1,55 @@
+@{
+    ViewData["Title"] = "Dodaj pojazd";
+
+    var brand = ViewData["Brand"] as string ?? string.Empty;
+    var vehicleModel = ViewData["Model"] as string ?? string.Empty;
+    var vin = ViewData["Vin"] as string ?? string.Empty;
+    var registrationNumber = ViewData["RegistrationNumber"] as string ?? string.Empty;
+    var year = ViewData["Year"] as string ?? string.Empty;
+    var imageUrl = ViewData["ImageUrl"] as string ?? "https://via.placeholder.com/150";
+
+    var errors = ViewData["Errors"] as Dictionary<string, string> ?? new Dictionary<string, string>();
+}
+<h2>Dodaj pojazd</h2>
+
+<div class="text-danger" asp-validation-summary="All"></div>
+
+<form asp-controller="Vehicle" asp-action="Add" method="post">
+    <div class="form-group">
+        <label for="Brand">Marka</label>
+        <input type="text" id="Brand" name="Brand" class="form-control" value="@brand" />
+        <span class="text-danger field-validation-error">@errors.GetValueOrDefault("Brand", "")</span>
+    </div>
+    <div class="form-group">
+        <label for="Model">Model</label>
+        <input type="text" id="Model" name="Model" class="form-control" value="@vehicleModel" />
+        <span class="text-danger field-validation-error">@((errors != null && errors.ContainsKey("Model")) ? errors["Model"] : "")</span>
+    </div>
+    <div class="form-group">
+        <label for="Vin">VIN</label>
+        <input type="text" id="Vin" name="Vin" class="form-control" value="@vin" />
+        <span class="text-danger field-validation-error">@errors.GetValueOrDefault("Vin", "")</span>
+    </div>
+    <div class="form-group">
+        <label for="RegistrationNumber">Numer rejestracyjny</label>
+        <input type="text" id="RegistrationNumber" name="RegistrationNumber" class="form-control" value="@registrationNumber" />
+        <span class="text-danger field-validation-error">@errors.GetValueOrDefault("RegistrationNumber", "")</span>
+    </div>
+    <div class="form-group">
+        <label for="Year">Rok produkcji</label>
+        <input type="number" id="Year" name="Year" class="form-control" value="@year" />
+        <span class="text-danger field-validation-error">@errors.GetValueOrDefault("Year", "")</span>
+    </div>
+    <div class="form-group">
+        <label for="ImageUrl">URL obrazka</label>
+        <input type="text" id="ImageUrl" name="ImageUrl" class="form-control" value="@imageUrl" />
+        <span class="text-danger field-validation-error">@errors.GetValueOrDefault("ImageUrl", "")</span>
+    </div>
+
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-primary">Dodaj pojazd</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
