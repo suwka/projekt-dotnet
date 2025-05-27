@@ -25,6 +25,7 @@ namespace WorkshopManager.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(RegisterViewModel model)
         {
             if (ModelState.IsValid)
@@ -35,6 +36,22 @@ namespace WorkshopManager.Controllers
                 {
                     // Dodaj do roli Klient
                     await _userManager.AddToRoleAsync(user, "Klient");
+
+                    // Dodaj klienta do bazy
+                    using (var scope = HttpContext.RequestServices.CreateScope())
+                    {
+                        var dbContext = (WorkshopManager.Data.ApplicationDbContext)scope.ServiceProvider.GetService(typeof(WorkshopManager.Data.ApplicationDbContext));
+                        var customer = new WorkshopManager.Models.Customer
+                        {
+                            FirstName = model.FirstName,
+                            LastName = model.LastName,
+                            Phone = model.Phone,
+                            IdentityUserId = user.Id
+                        };
+                        dbContext.Customers.Add(customer);
+                        dbContext.SaveChanges();
+                    }
+
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("Panel", "Client");
                 }
