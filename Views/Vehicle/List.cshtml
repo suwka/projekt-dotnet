@@ -1,11 +1,15 @@
 @model IEnumerable<WorkshopManager.Models.Vehicle>
+
 @{
-    ViewData["Title"] = "Panel klienta";
+    ViewData["Title"] = "Twoje pojazdy";
 }
-<h2>Panel klienta</h2>
-<p>Witaj <strong>@ViewBag.FirstName @ViewBag.LastName</strong>!</p>
-<p>Tutaj możesz zarządzać swoimi usługami i danymi.</p>
-<a class="btn btn-success" href="/Vehicle/Add">Dodaj pojazd</a>
+
+<h2>Lista pojazdów</h2>
+
+@if (Model.Any())
+{
+    <h4>Twoje dodane pojazdy</h4>
+}
 
 @if (!Model.Any())
 {
@@ -21,6 +25,7 @@ else
                 <th>VIN</th>
                 <th>Rejestracja</th>
                 <th>Rok produkcji</th>
+                <th>Akcje</th>
             </tr>
         </thead>
         <tbody>
@@ -32,9 +37,11 @@ else
                 <td>@vehicle.Vin</td>
                 <td>@vehicle.RegistrationNumber</td>
                 <td>@vehicle.Year</td>
+                <td>
+                    <a class="btn btn-primary" href="/ServiceOrder/Create?vehicleId=@vehicle.Id">Złóż zlecenie</a>
+                </td>
             </tr>
         }
         </tbody>
     </table>
 }
-

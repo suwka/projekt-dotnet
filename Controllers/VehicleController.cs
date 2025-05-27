@@ -122,5 +122,18 @@ namespace WorkshopManager.Controllers
             // Jeśli dane są niepoprawne, wróć do formularza
             return View();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> List()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var customer = _context.Customers.FirstOrDefault(c => c.IdentityUserId == user.Id);
+            if (customer == null)
+            {
+                return NotFound();
+            }
+            var vehicles = _context.Vehicles.Where(v => v.CustomerId == customer.Id).ToList();
+            return View(vehicles);
+        }
     }
 }

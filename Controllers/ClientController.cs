@@ -30,7 +30,8 @@ namespace WorkshopManager.Controllers
                 return RedirectToAction("Index", "Home");
             ViewBag.FirstName = customer.FirstName;
             ViewBag.LastName = customer.LastName;
-            return View();
+            var vehicles = _context.Vehicles.Where(v => v.CustomerId == customer.Id).ToList();
+            return View(vehicles);
         }
     }
 }
