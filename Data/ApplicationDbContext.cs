@@ -11,6 +11,8 @@ namespace WorkshopManager.Data
         {
         }
 
+        public ApplicationDbContext() { }
+
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<ServiceOrder> ServiceOrders { get; set; }
@@ -18,6 +20,14 @@ namespace WorkshopManager.Data
         public DbSet<Part> Parts { get; set; }
         public DbSet<UsedPart> UsedParts { get; set; }
         public DbSet<Comment> Comments { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=WorkshopManagerDB;Trusted_Connection=True;TrustServerCertificate=True;");
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -43,7 +53,7 @@ namespace WorkshopManager.Data
                 .HasOne(so => so.Vehicle)
                 .WithMany(v => v.ServiceOrders)
                 .HasForeignKey(so => so.VehicleId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Relacja ServiceOrder - ServiceTask (1:N)
             modelBuilder.Entity<ServiceTask>()
@@ -71,7 +81,15 @@ namespace WorkshopManager.Data
                 .HasOne(c => c.ServiceOrder)
                 .WithMany(so => so.Comments)
                 .HasForeignKey(c => c.ServiceOrderId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Ustawienie precyzji dla decimal
+            modelBuilder.Entity<Part>()
+                .Property(p => p.UnitPrice)
+                .HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<ServiceTask>()
+                .Property(st => st.LaborCost)
+                .HasColumnType("decimal(18,2)");
         }
     }
 }
