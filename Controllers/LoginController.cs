@@ -36,6 +36,10 @@ namespace WorkshopManager.Controllers
                     var user = await _signInManager.UserManager.FindByEmailAsync(model.Email);
                     if (await _signInManager.UserManager.IsInRoleAsync(user, "Admin"))
                         return RedirectToAction("Panel", "Admin");
+                    else if (await _signInManager.UserManager.IsInRoleAsync(user, "Mechanic"))
+                        return RedirectToAction("Panel", "Mechanic");
+                    else if (await _signInManager.UserManager.IsInRoleAsync(user, "Receptionist"))
+                        return RedirectToAction("Panel", "Receptionist");
                     else
                         return RedirectToAction("Panel", "Client");
                 }
@@ -53,3 +57,4 @@ namespace WorkshopManager.Controllers
         }
     }
 }
+

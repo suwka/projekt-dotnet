@@ -11,6 +11,8 @@
     <Folder Include="DTOs\" />
     <Folder Include="Mappers\" />
     <Folder Include="Services\" />
+    <Folder Include="Views\Mechanic\" />
+    <Folder Include="Views\Receptionist\" />
     <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 
