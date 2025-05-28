@@ -46,7 +46,7 @@ namespace WorkshopManager.Controllers
                 serviceOrder.Status = WorkshopManager.Models.ServiceOrderStatus.Nowe;
                 _context.ServiceOrders.Add(serviceOrder);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Panel", "Client");
+                return RedirectToAction("Panel", "Receptionist"); // Zmieniono na Receptionist
             }
             return View(serviceOrder);
         }

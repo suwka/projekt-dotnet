@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,17 +18,22 @@ namespace WorkshopManager.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly ILogger<VehicleController> _logger;
 
-        public VehicleController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        public VehicleController(
+            ApplicationDbContext context, 
+            UserManager<IdentityUser> userManager,
+            ILogger<VehicleController> logger)
         {
             _context = context;
             _userManager = userManager;
+            _logger = logger;
         }
 
         [HttpGet]
         public IActionResult Add()
         {
-            // Przekazujemy pusty ViewBag zamiast VehicleViewModel
+            // Przekazujemy pusty ViewBag zamiast modelu
             return View();
         }
 
@@ -99,11 +107,27 @@ namespace WorkshopManager.Controllers
             ViewData["ImageUrl"] = imageUrl;
             ViewData["Errors"] = errorList;
 
-            // Jeśli dane są poprawne
-            if (isValid)
+            if (!isValid)
+            {
+                return View();
+            }
+
+            try
             {
                 var user = await _userManager.GetUserAsync(User);
-                var customer = _context.Customers.First(c => c.IdentityUserId == user.Id);
+                if (user == null)
+                {
+                    ModelState.AddModelError("", "Nie można zidentyfikować użytkownika.");
+                    return View();
+                }
+                
+                var customer = await _context.Customers.FirstOrDefaultAsync(c => c.IdentityUserId == user.Id);
+                if (customer == null)
+                {
+                    ModelState.AddModelError("", "Nie można znaleźć powiązanego profilu klienta.");
+                    return View();
+                }
+                
                 var vehicle = new Vehicle
                 {
                     Brand = brand,
@@ -111,29 +135,33 @@ namespace WorkshopManager.Controllers
                     Vin = vin,
                     RegistrationNumber = registrationNumber,
                     Year = year,
-                    ImageUrl = imageUrl,
+                    ImageUrl = string.IsNullOrEmpty(imageUrl) ? "https://via.placeholder.com/150" : imageUrl,
                     CustomerId = customer.Id
                 };
+
                 _context.Vehicles.Add(vehicle);
                 await _context.SaveChangesAsync();
+                
+                TempData["SuccessMessage"] = "Pomyślnie dodano pojazd.";
                 return RedirectToAction("Panel", "Client");
             }
-
-            // Jeśli dane są niepoprawne, wróć do formularza
-            return View();
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Wystąpił nieoczekiwany błąd: {ex.Message}");
+                return View();
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> List()
         {
             var user = await _userManager.GetUserAsync(User);
-            var customer = _context.Customers.FirstOrDefault(c => c.IdentityUserId == user.Id);
-            if (customer == null)
-            {
-                return NotFound();
-            }
-            var vehicles = _context.Vehicles.Where(v => v.CustomerId == customer.Id).ToList();
-            return View(vehicles);
+            if (user == null) return Challenge();
+
+            var customer = await _context.Customers.Include(c => c.Vehicles).FirstOrDefaultAsync(c => c.IdentityUserId == user.Id);
+            if (customer == null) return NotFound("Nie znaleziono profilu klienta.");
+
+            return View(customer.Vehicles ?? new List<Vehicle>());
         }
     }
 }
