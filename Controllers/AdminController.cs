@@ -17,9 +17,20 @@ namespace WorkshopManager.Controllers
             _roleManager = roleManager;
         }
 
-        public IActionResult Panel()
+        public async Task<IActionResult> Panel()
         {
-            return View();
+            var allUsers = _userManager.Users.ToList();
+            var mechanics = new List<IdentityUser>();
+            var receptionists = new List<IdentityUser>();
+            foreach (var user in allUsers)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                if (roles.Contains("Mechanic"))
+                    mechanics.Add(user);
+                if (roles.Contains("Receptionist"))
+                    receptionists.Add(user);
+            }
+            return View(Tuple.Create(allUsers, mechanics, receptionists));
         }
 
         [HttpGet]

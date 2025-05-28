@@ -1,7 +1,67 @@
+@using Microsoft.AspNetCore.Identity
+@model Tuple<List<IdentityUser>, List<IdentityUser>, List<IdentityUser>>
 @{
     ViewData["Title"] = "Panel administratora";
+    var allUsers = Model.Item1;
+    var mechanics = Model.Item2;
+    var receptionists = Model.Item3;
 }
 <h2>Panel administratora</h2>
 <p>Witaj w panelu administratora!</p>
-
 <a class="btn btn-success" asp-action="RegisterUser">Dodaj nowego użytkownika</a>
+
+<hr />
+<h3>Wszyscy użytkownicy</h3>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Email (Login)</th>
+            <th>Role</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var user in allUsers)
+    {
+        var roles = await Context.RequestServices.GetService<UserManager<IdentityUser>>().GetRolesAsync(user);
+        <tr>
+            <td>@user.Email</td>
+            <td>@string.Join(", ", roles)</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<h3>Mechanicy</h3>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Email (Login)</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var user in mechanics)
+    {
+        <tr>
+            <td>@user.Email</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<h3>Recepcjoniści</h3>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Email (Login)</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var user in receptionists)
+    {
+        <tr>
+            <td>@user.Email</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
