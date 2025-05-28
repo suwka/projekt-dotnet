@@ -1,10 +1,11 @@
 @using Microsoft.AspNetCore.Identity
-@model Tuple<List<IdentityUser>, List<IdentityUser>, List<IdentityUser>>
+@model Tuple<List<IdentityUser>, List<IdentityUser>, List<IdentityUser>, List<IdentityUser>>
 @{
     ViewData["Title"] = "Panel administratora";
     var allUsers = Model.Item1;
     var mechanics = Model.Item2;
     var receptionists = Model.Item3;
+    var admins = Model.Item4;
 }
 <h2>Panel administratora</h2>
 <p>Witaj w panelu administratora!</p>
@@ -65,3 +66,19 @@
     </tbody>
 </table>
 
+<h3>Administratorzy</h3>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Email (Login)</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var user in admins)
+    {
+        <tr>
+            <td>@user.Email</td>
+        </tr>
+    }
+    </tbody>
+</table>

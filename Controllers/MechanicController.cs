@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WorkshopManager.Controllers
 {
-    [Authorize(Roles = "Mechanic")]
+    [Authorize(Roles = "Mechanik")]
     public class MechanicController : Controller
     {
         public IActionResult Panel()
