@@ -1,83 +1,55 @@
 @using Microsoft.AspNetCore.Identity
-@model Tuple<List<IdentityUser>, List<IdentityUser>, List<IdentityUser>, List<IdentityUser>>
+@model List<IdentityUser>
 @{
     ViewData["Title"] = "Panel administratora";
-    var allUsers = Model.Item1;
-    var mechanics = Model.Item2;
-    var receptionists = Model.Item3;
-    var admins = Model.Item4;
+    var roles = ViewBag.Roles as List<string>;
+    var selectedRole = ViewBag.SelectedRole as string;
 }
 <h2>Panel administratora</h2>
 <p>Witaj w panelu administratora!</p>
 <a class="btn btn-success" asp-action="RegisterUser">Dodaj nowego użytkownika</a>
-
 <hr />
-<h3>Wszyscy użytkownicy</h3>
+<form method="get" asp-action="Panel">
+    <label for="role">Wybierz rolę:</label>
+    <select id="role" name="role" onchange="this.form.submit()">
+        @foreach (var role in roles)
+        {
+            if (role == selectedRole)
+            {
+                <option value="@role" selected>@role</option>
+            }
+            else
+            {
+                <option value="@role">@role</option>
+            }
+        }
+    </select>
+    <noscript><input type="submit" value="Filtruj" /></noscript>
+</form>
+<hr />
+<h3>Lista użytkowników (@selectedRole)</h3>
 <table class="table table-bordered">
     <thead>
         <tr>
             <th>Email (Login)</th>
             <th>Role</th>
+            <th>Akcje</th>
         </tr>
     </thead>
     <tbody>
-    @foreach (var user in allUsers)
+    @foreach (var user in Model)
     {
-        var roles = await Context.RequestServices.GetService<UserManager<IdentityUser>>().GetRolesAsync(user);
+        var userManager = Context.RequestServices.GetService<UserManager<IdentityUser>>();
+        var rolesForUser = await userManager.GetRolesAsync(user);
         <tr>
             <td>@user.Email</td>
-            <td>@string.Join(", ", roles)</td>
-        </tr>
-    }
-    </tbody>
-</table>
-
-<h3>Mechanicy</h3>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Email (Login)</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var user in mechanics)
-    {
-        <tr>
-            <td>@user.Email</td>
-        </tr>
-    }
-    </tbody>
-</table>
-
-<h3>Recepcjoniści</h3>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Email (Login)</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var user in receptionists)
-    {
-        <tr>
-            <td>@user.Email</td>
-        </tr>
-    }
-    </tbody>
-</table>
-
-<h3>Administratorzy</h3>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Email (Login)</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var user in admins)
-    {
-        <tr>
-            <td>@user.Email</td>
+            <td>@string.Join(", ", rolesForUser)</td>
+            <td>
+                <a class="btn btn-primary btn-sm" asp-action="EditUser" asp-route-id="@user.Id">Edytuj</a>
+                <form asp-action="DeleteUser" asp-route-id="@user.Id" method="post" style="display:inline" onsubmit="return confirm('Czy na pewno chcesz usunąć to konto?');">
+                    <button type="submit" class="btn btn-danger btn-sm">Usuń</button>
+                </form>
+            </td>
         </tr>
     }
     </tbody>

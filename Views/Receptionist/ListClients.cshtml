@@ -1,0 +1,55 @@
+@model IEnumerable<WorkshopManager.Models.Customer>
+@{
+    ViewData["Title"] = "Lista Klientów";
+}
+
+<h2>Lista Klientów</h2>
+
+<p>
+    <a asp-action="CreateClient" class="btn btn-primary">Dodaj nowego klienta</a>
+</p>
+
+<form asp-action="ListClients" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Szukaj: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
+            <input type="submit" value="Szukaj" class="btn btn-default" /> |
+            <a asp-action="ListClients">Pełna lista</a>
+        </p>
+    </div>
+</form>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nazwisko</th>
+            <th>Imię</th>
+            <th>Email</th>
+            <th>Telefon</th>
+            <th>Akcje</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.LastName)</td>
+                <td>@Html.DisplayFor(modelItem => item.FirstName)</td>
+                <td>@Html.DisplayFor(modelItem => item.IdentityUser.Email)</td>
+                <td>@Html.DisplayFor(modelItem => item.Phone)</td>
+                <td>
+                    <a asp-action="ClientDetails" asp-route-id="@item.Id" class="btn btn-info btn-sm">Szczegóły</a>
+                    @* Można dodać Edytuj/Usuń jeśli potrzebne *@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

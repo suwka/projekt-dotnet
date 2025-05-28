@@ -1,0 +1,59 @@
+@model WorkshopManager.Models.Customer
+
+@{
+    ViewData["Title"] = "Szczegóły Klienta";
+}
+
+<h2>Szczegóły Klienta</h2>
+
+<div>
+    <h4>@Model.FirstName @Model.LastName</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Email</dt>
+        <dd class="col-sm-10">@Model.IdentityUser?.Email</dd>
+
+        <dt class="col-sm-2">Telefon</dt>
+        <dd class="col-sm-10">@Model.Phone</dd>
+    </dl>
+</div>
+
+<h4>Pojazdy Klienta</h4>
+@if (Model.Vehicles != null && Model.Vehicles.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Marka</th>
+                <th>Model</th>
+                <th>Numer Rejestracyjny</th>
+                <th>VIN</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vehicle in Model.Vehicles)
+            {
+                <tr>
+                    <td>@vehicle.Brand</td> 
+                    <td>@vehicle.Model</td>
+                    <td>@vehicle.RegistrationNumber</td>
+                    <td>@vehicle.Vin</td>
+                    <td>
+                        <a asp-controller="ServiceOrder" asp-action="Create" asp-route-vehicleId="@vehicle.Id" class="btn btn-success btn-sm">Utwórz Zlecenie</a>
+                        @* Można dodać link do edycji pojazdu, jeśli taka funkcjonalność istnieje *@
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Ten klient nie ma jeszcze dodanych żadnych pojazdów.</p>
+    <p><small>Pojazdy może dodawać tylko klient z poziomu swojego konta.</small></p>
+}
+
+<p class="mt-2">
+    <a asp-action="ListClients" class="btn btn-secondary">Powrót do Listy Klientów</a>
+</p>

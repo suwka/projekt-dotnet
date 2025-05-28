@@ -23,7 +23,7 @@
     <div class="form-group">
         <label for="Model">Model</label>
         <input type="text" id="Model" name="Model" class="form-control" value="@vehicleModel" />
-        <span class="text-danger field-validation-error">@((errors != null && errors.ContainsKey("Model")) ? errors["Model"] : "")</span>
+        <span class="text-danger field-validation-error">@errors.GetValueOrDefault("Model", "")</span>
     </div>
     <div class="form-group">
         <label for="Vin">VIN</label>
@@ -47,9 +47,8 @@
     </div>
 
     @Html.AntiForgeryToken()
-    <button type="submit" class="btn btn-primary">Dodaj pojazd</button>
+    <div class="form-group mt-2">
+        <button type="submit" class="btn btn-primary">Dodaj pojazd</button>
+        <a asp-action="List" class="btn btn-secondary">Powrót</a>
+    </div>
 </form>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}

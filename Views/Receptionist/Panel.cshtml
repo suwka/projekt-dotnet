@@ -1,6 +1,55 @@
+@model IEnumerable<WorkshopManager.Models.ServiceOrder>
 @{
-    ViewData["Title"] = "Panel recepcjonisty";
+    ViewData["Title"] = "Panel Recepcjonisty - Zlecenia Serwisowe";
 }
-<h2>Witaj, panie recepcjonisto!</h2>
-<p>To jest panel recepcjonisty. Tutaj możesz zarządzać obsługą klientów i zleceniami.</p>
+
+@if (ViewBag.ShowClientManagement == true)
+{
+    <div class="mb-3">
+        <a asp-controller="Receptionist" asp-action="ListClients" class="btn btn-info">Zarządzaj Klientami</a>
+    </div>
+}
+
+<h2>Zlecenia Serwisowe</h2>
+
+@* Usunięto przycisk "Dodaj nowe zlecenie" - zostanie zastąpiony zarządzaniem klientami *@
+
+@if (!Model.Any())
+{
+    <p>Brak aktywnych zleceń serwisowych.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID Zlecenia</th>
+                <th>Klient</th>
+                <th>Pojazd (Rejestracja)</th>
+                <th>Data Przyjęcia</th>
+                <th>Status</th>
+                <th>Opis Problemu</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@((item.Vehicle?.Customer?.FirstName + " " + item.Vehicle?.Customer?.LastName).Trim() ?? "Brak danych klienta")</td>
+                    <td>@(item.Vehicle?.Model ?? "Brak danych pojazdu") (@(item.Vehicle?.RegistrationNumber ?? "Brak"))</td>
+                    <td>@item.CreatedAt.ToShortDateString()</td>
+                    <td>@item.Status</td>
+                    <td>@item.ProblemDescription</td>
+                    <td>
+                        <a asp-controller="ServiceOrder" asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Szczegóły</a>
+                        <a asp-controller="ServiceOrder" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Edytuj</a>
+                        @* Można dodać więcej akcji, np. Usuń, Zmień status itp. *@
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
