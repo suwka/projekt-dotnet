@@ -22,15 +22,18 @@ namespace WorkshopManager.Controllers
             var allUsers = _userManager.Users.ToList();
             var mechanics = new List<IdentityUser>();
             var receptionists = new List<IdentityUser>();
+            var admins = new List<IdentityUser>();
             foreach (var user in allUsers)
             {
                 var roles = await _userManager.GetRolesAsync(user);
-                if (roles.Contains("Mechanic"))
+                if (roles.Contains("Mechanik"))
                     mechanics.Add(user);
-                if (roles.Contains("Receptionist"))
+                if (roles.Contains("Recepcjonista"))
                     receptionists.Add(user);
+                if (roles.Contains("Admin"))
+                    admins.Add(user);
             }
-            return View(Tuple.Create(allUsers, mechanics, receptionists));
+            return View(Tuple.Create(allUsers, mechanics, receptionists, admins));
         }
 
         [HttpGet]
