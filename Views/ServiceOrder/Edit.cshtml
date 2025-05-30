@@ -1,0 +1,72 @@
+@model WorkshopManager.Models.ServiceOrder
+@{
+    ViewData["Title"] = "Edycja zlecenia serwisowego";
+}
+
+<h2>Edycja zlecenia serwisowego</h2>
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="VehicleId" />
+            <input type="hidden" asp-for="CreatedAt" />
+            <input type="hidden" asp-for="ClosedAt" />
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Informacje podstawowe</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">Klient:</dt>
+                                <dd class="col-sm-8">@((Model.Vehicle?.Customer?.FirstName + " " + Model.Vehicle?.Customer?.LastName).Trim() ?? "Brak danych klienta")</dd>
+                                
+                                <dt class="col-sm-4">Pojazd:</dt>
+                                <dd class="col-sm-8">@(Model.Vehicle?.Brand + " " + Model.Vehicle?.Model)</dd>
+                                
+                                <dt class="col-sm-4">Nr rejestracyjny:</dt>
+                                <dd class="col-sm-8">@Model.Vehicle?.RegistrationNumber</dd>
+                                
+                                <dt class="col-sm-4">Data przyjęcia:</dt>
+                                <dd class="col-sm-8">@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Status" class="control-label">Status zlecenia</label>
+                <select asp-for="Status" class="form-control" asp-items="ViewBag.Statuses"></select>
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="AssignedMechanicId" class="control-label">Przypisany mechanik</label>
+                <select asp-for="AssignedMechanicId" class="form-control" asp-items="ViewBag.Mechanics">
+                    <option value="">-- Wybierz mechanika --</option>
+                </select>
+                <span asp-validation-for="AssignedMechanicId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ProblemDescription" class="control-label">Opis problemu</label>
+                <textarea asp-for="ProblemDescription" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="ProblemDescription" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+                <a asp-controller="Receptionist" asp-action="Panel" class="btn btn-secondary">Powrót do panelu recepcjonisty</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

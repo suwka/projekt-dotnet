@@ -5,9 +5,10 @@
 
 <h2>Lista Klientów</h2>
 
-<p>
+<div class="d-flex justify-content-between align-items-center mb-3">
     <a asp-action="CreateClient" class="btn btn-primary">Dodaj nowego klienta</a>
-</p>
+    <a asp-action="Panel" class="btn btn-secondary">Powrót do panelu recepcjonisty</a>
+</div>
 
 <form asp-action="ListClients" method="get">
     <div class="form-actions no-color">

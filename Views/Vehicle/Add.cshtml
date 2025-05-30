@@ -1,3 +1,6 @@
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@inject UserManager<IdentityUser> UserManager
 @{
     ViewData["Title"] = "Dodaj pojazd";
 
@@ -9,12 +12,52 @@
     var imageUrl = ViewData["ImageUrl"] as string ?? "https://via.placeholder.com/150";
 
     var errors = ViewData["Errors"] as Dictionary<string, string> ?? new Dictionary<string, string>();
+    var isReceptionist = User.IsInRole("Recepcjonista");
+    var customerId = ViewBag.CustomerId as int?;
+    var customerName = ViewBag.CustomerName as string;
+    var customers = ViewBag.Customers as List<WorkshopManager.Models.Customer>;
 }
+
 <h2>Dodaj pojazd</h2>
 
 <div class="text-danger" asp-validation-summary="All"></div>
 
 <form asp-controller="Vehicle" asp-action="Add" method="post">
+    @if (isReceptionist)
+    {
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Klient</h5>
+            </div>
+            <div class="card-body">
+                @if (customerId.HasValue && !string.IsNullOrEmpty(customerName))
+                {
+                    <p>Dodajesz pojazd dla klienta: <strong>@customerName</strong></p>
+                    <input type="hidden" name="CustomerId" value="@customerId" />
+                }
+                else if (customers != null && customers.Any())
+                {
+                    <div class="form-group mb-3">
+                        <label for="CustomerId">Wybierz klienta:</label>
+                        <select id="CustomerId" name="CustomerId" class="form-select">
+                            <option value="">-- Wybierz klienta --</option>
+                            @foreach (var customer in customers)
+                            {
+                                <option value="@customer.Id">@customer.LastName @customer.FirstName</option>
+                            }
+                        </select>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning">
+                        Nie znaleziono klientów. <a asp-controller="Receptionist" asp-action="CreateClient">Dodaj nowego klienta</a>.
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
     <div class="form-group">
         <label for="Brand">Marka</label>
         <input type="text" id="Brand" name="Brand" class="form-control" value="@brand" />
@@ -47,8 +90,18 @@
     </div>
 
     @Html.AntiForgeryToken()
-    <div class="form-group mt-2">
+    <div class="form-group mt-3">
         <button type="submit" class="btn btn-primary">Dodaj pojazd</button>
-        <a asp-action="List" class="btn btn-secondary">Powrót</a>
+        @if (isReceptionist)
+        {
+            <a asp-controller="Receptionist" asp-action="ListClients" class="btn btn-secondary">Powrót</a>
+        }
+        else
+        {
+            <a asp-controller="Client" asp-action="Panel" class="btn btn-secondary">Anuluj</a>
+        }
     </div>
 </form>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
