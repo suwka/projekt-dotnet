@@ -13,7 +13,7 @@ using WorkshopManager.Models;
 
 namespace WorkshopManager.Controllers
 {
-    [Authorize(Roles = "Klient")]
+    [Authorize(Roles = "Klient, Recepcjonista")]
     public class VehicleController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -31,9 +31,26 @@ namespace WorkshopManager.Controllers
         }
 
         [HttpGet]
-        public IActionResult Add()
+        public async Task<IActionResult> Add(int? customerId = null)
         {
-            // Przekazujemy pusty ViewBag zamiast modelu
+            // Jeśli przekazano ID klienta, pobierz dane klienta
+            if (customerId.HasValue)
+            {
+                var customer = await _context.Customers.FindAsync(customerId.Value);
+                if (customer != null)
+                {
+                    ViewBag.CustomerId = customer.Id;
+                    ViewBag.CustomerName = $"{customer.FirstName} {customer.LastName}";
+                }
+            }
+            
+            // Dla recepcjonisty, jeśli nie podano customerId, wyświetl listę klientów do wyboru
+            if (User.IsInRole("Recepcjonista") && !customerId.HasValue)
+            {
+                var customers = await _context.Customers.OrderBy(c => c.LastName).ThenBy(c => c.FirstName).ToListAsync();
+                ViewBag.Customers = customers;
+            }
+            
             return View();
         }
 
@@ -48,7 +65,8 @@ namespace WorkshopManager.Controllers
             var registrationNumber = form["RegistrationNumber"].ToString();
             var yearString = form["Year"].ToString();
             var imageUrl = form["ImageUrl"].ToString();
-
+            var customerIdString = form["CustomerId"].ToString();
+            
             // Walidacja formularza ręcznie
             bool isValid = true;
             var errorList = new Dictionary<string, string>();
@@ -109,23 +127,70 @@ namespace WorkshopManager.Controllers
 
             if (!isValid)
             {
+                // Jeśli jest recepcjonista, pobierz listę klientów
+                if (User.IsInRole("Recepcjonista"))
+                {
+                    if (!string.IsNullOrEmpty(customerIdString) && int.TryParse(customerIdString, out int customerId))
+                    {
+                        var customer = await _context.Customers.FindAsync(customerId);
+                        if (customer != null)
+                        {
+                            ViewBag.CustomerId = customer.Id;
+                            ViewBag.CustomerName = $"{customer.FirstName} {customer.LastName}";
+                        }
+                    }
+                    else
+                    {
+                        var customers = await _context.Customers.OrderBy(c => c.LastName).ThenBy(c => c.FirstName).ToListAsync();
+                        ViewBag.Customers = customers;
+                    }
+                }
                 return View();
             }
 
             try
             {
-                var user = await _userManager.GetUserAsync(User);
-                if (user == null)
-                {
-                    ModelState.AddModelError("", "Nie można zidentyfikować użytkownika.");
-                    return View();
-                }
+                Customer customer = null;
                 
-                var customer = await _context.Customers.FirstOrDefaultAsync(c => c.IdentityUserId == user.Id);
-                if (customer == null)
+                // Sprawdź, czy działa recepcjonista czy klient
+                if (User.IsInRole("Recepcjonista"))
                 {
-                    ModelState.AddModelError("", "Nie można znaleźć powiązanego profilu klienta.");
-                    return View();
+                    // Recepcjonista dodaje pojazd dla konkretnego klienta
+                    if (!string.IsNullOrEmpty(customerIdString) && int.TryParse(customerIdString, out int customerId))
+                    {
+                        customer = await _context.Customers.FindAsync(customerId);
+                        if (customer == null)
+                        {
+                            ModelState.AddModelError("", "Nie można znaleźć wybranego klienta.");
+                            var customers = await _context.Customers.OrderBy(c => c.LastName).ThenBy(c => c.FirstName).ToListAsync();
+                            ViewBag.Customers = customers;
+                            return View();
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Musisz wybrać klienta.");
+                        var customers = await _context.Customers.OrderBy(c => c.LastName).ThenBy(c => c.FirstName).ToListAsync();
+                        ViewBag.Customers = customers;
+                        return View();
+                    }
+                }
+                else
+                {
+                    // Klient dodaje pojazd do własnego konta
+                    var user = await _userManager.GetUserAsync(User);
+                    if (user == null)
+                    {
+                        ModelState.AddModelError("", "Nie można zidentyfikować użytkownika.");
+                        return View();
+                    }
+                    
+                    customer = await _context.Customers.FirstOrDefaultAsync(c => c.IdentityUserId == user.Id);
+                    if (customer == null)
+                    {
+                        ModelState.AddModelError("", "Nie można znaleźć powiązanego profilu klienta.");
+                        return View();
+                    }
                 }
                 
                 var vehicle = new Vehicle
@@ -143,11 +208,28 @@ namespace WorkshopManager.Controllers
                 await _context.SaveChangesAsync();
                 
                 TempData["SuccessMessage"] = "Pomyślnie dodano pojazd.";
-                return RedirectToAction("Panel", "Client");
+                
+                // Przekieruj w zależności od roli
+                if (User.IsInRole("Recepcjonista"))
+                {
+                    return RedirectToAction("ClientDetails", "Receptionist", new { id = customer.Id });
+                }
+                else
+                {
+                    return RedirectToAction("Panel", "Client");
+                }
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError("", $"Wystąpił nieoczekiwany błąd: {ex.Message}");
+                
+                // Jeśli jest recepcjonista, pobierz listę klientów
+                if (User.IsInRole("Recepcjonista"))
+                {
+                    var customers = await _context.Customers.OrderBy(c => c.LastName).ThenBy(c => c.FirstName).ToListAsync();
+                    ViewBag.Customers = customers;
+                }
+                
                 return View();
             }
         }

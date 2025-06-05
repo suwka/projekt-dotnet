@@ -51,8 +51,11 @@
 else
 {
     <p>Ten klient nie ma jeszcze dodanych żadnych pojazdów.</p>
-    <p><small>Pojazdy może dodawać tylko klient z poziomu swojego konta.</small></p>
 }
+
+<div class="mt-3 mb-3">
+    <a asp-controller="Vehicle" asp-action="Add" asp-route-customerId="@Model.Id" class="btn btn-primary">Dodaj pojazd dla klienta</a>
+</div>
 
 <p class="mt-2">
     <a asp-action="ListClients" class="btn btn-secondary">Powrót do Listy Klientów</a>
