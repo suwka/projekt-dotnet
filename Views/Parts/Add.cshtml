@@ -1,0 +1,63 @@
+@model WorkshopManager.Models.Part
+@{
+    ViewData["Title"] = "Dodaj część";
+}
+
+@if (TempData["AddPartError"] != null)
+{
+    <div class="alert alert-danger">@TempData["AddPartError"]</div>
+}
+@if (TempData["AddPartSuccess"] != null)
+{
+    <div class="alert alert-success">@TempData["AddPartSuccess"]</div>
+}
+
+@if (ViewBag.DebugValues != null)
+{
+    <div class="alert alert-info">
+        <strong>Dane przesyłane do kontrolera:</strong>
+        <pre>@ViewBag.DebugValues</pre>
+    </div>
+}
+
+<h2>Dodaj nową część do magazynu</h2>
+
+<form asp-action="Add" method="post" class="mb-4">
+    <input type="hidden" asp-for="UsedParts" value="null" />
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Manufacturer"></label>
+        <input asp-for="Manufacturer" class="form-control" />
+        <span asp-validation-for="Manufacturer" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CatalogNumber"></label>
+        <input asp-for="CatalogNumber" class="form-control" />
+        <span asp-validation-for="CatalogNumber" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Quantity"></label>
+        <input asp-for="Quantity" class="form-control" min="0" required />
+        <span asp-validation-for="Quantity" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="UnitPrice"></label>
+        <input asp-for="UnitPrice" class="form-control" step="0.01" min="0" required />
+        <span asp-validation-for="UnitPrice" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Dodaj część</button>
+    <a asp-action="Index" class="btn btn-secondary mt-2">Powrót do listy części</a>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
