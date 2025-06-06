@@ -89,6 +89,26 @@ namespace WorkshopManager.Controllers
                 return NotFound();
             }
 
+            // Najprostsze rozwiązanie: słownik AuthorId => rola (pierwsza rola)
+            var commentRoles = new Dictionary<string, string>();
+            foreach (var comment in serviceOrder.Comments)
+            {
+                if (comment.AuthorId != null && !commentRoles.ContainsKey(comment.AuthorId))
+                {
+                    var user = await _userManager.FindByIdAsync(comment.AuthorId);
+                    if (user != null)
+                    {
+                        var roles = await _userManager.GetRolesAsync(user);
+                        commentRoles[comment.AuthorId] = roles.FirstOrDefault() ?? "Brak roli";
+                    }
+                    else
+                    {
+                        commentRoles[comment.AuthorId] = "Brak użytkownika";
+                    }
+                }
+            }
+            ViewBag.CommentRoles = commentRoles;
+
             return View(serviceOrder);
         }
 
@@ -184,6 +204,67 @@ namespace WorkshopManager.Controllers
                 });
 
             return View(serviceOrder);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddComment(int orderId, string content)
+        {
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return RedirectToAction("Details", new { id = orderId });
+            }
+            var user = await _userManager.GetUserAsync(User);
+            var comment = new Comment
+            {
+                Content = content,
+                AuthorId = user.Id,
+                Timestamp = DateTime.Now,
+                ServiceOrderId = orderId
+            };
+            _context.Comments.Add(comment);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Details", new { id = orderId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditComment(int id)
+        {
+            var comment = await _context.Comments.Include(c => c.ServiceOrder).FirstOrDefaultAsync(c => c.Id == id);
+            if (comment == null) return NotFound();
+            var user = await _userManager.GetUserAsync(User);
+            if (comment.AuthorId != user.Id) return Forbid();
+            return View(comment);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditComment(int id, string content)
+        {
+            var comment = await _context.Comments.Include(c => c.ServiceOrder).FirstOrDefaultAsync(c => c.Id == id);
+            if (comment == null) return NotFound();
+            var user = await _userManager.GetUserAsync(User);
+            if (comment.AuthorId != user.Id) return Forbid();
+            if (!string.IsNullOrWhiteSpace(content))
+            {
+                comment.Content = content;
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction("Details", new { id = comment.ServiceOrderId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteComment(int id)
+        {
+            var comment = await _context.Comments.Include(c => c.ServiceOrder).FirstOrDefaultAsync(c => c.Id == id);
+            if (comment == null) return NotFound();
+            var user = await _userManager.GetUserAsync(User);
+            if (comment.AuthorId != user.Id) return Forbid();
+            int orderId = comment.ServiceOrderId;
+            _context.Comments.Remove(comment);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Details", new { id = orderId });
         }
 
         private bool ServiceOrderExists(int id)

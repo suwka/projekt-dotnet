@@ -5,5 +5,24 @@
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    @if (User.Identity.IsAuthenticated)
+    {
+        if (User.IsInRole("Admin"))
+        {
+            <a class="btn btn-primary mt-3" href="/Admin/Panel">Panel</a>
+        }
+        else if (User.IsInRole("Recepcjonista"))
+        {
+            <a class="btn btn-primary mt-3" href="/Receptionist/Panel">Panel</a>
+        }
+        else if (User.IsInRole("Mechanik"))
+        {
+            <a class="btn btn-primary mt-3" href="/Mechanic/Panel">Panel</a>
+        }
+        else if (User.IsInRole("Klient"))
+        {
+            <a class="btn btn-primary mt-3" href="/Client/Panel">Panel</a>
+        }
+    }
 </div>
 

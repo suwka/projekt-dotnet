@@ -1,7 +1,30 @@
 @model WorkshopManager.Models.ServiceOrder
-
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
 @{
     ViewData["Title"] = "Szczegóły zlecenia serwisowego";
+    var isMechanic = User.IsInRole("Mechanik");
+    var isReceptionist = User.IsInRole("Recepcjonista");
+    var isClient = User.IsInRole("Klient");
+}
+
+@functions {
+    public string GetStatusBadgeClass(WorkshopManager.Models.ServiceOrderStatus status)
+    {
+        switch (status)
+        {
+            case WorkshopManager.Models.ServiceOrderStatus.Nowe:
+                return "bg-secondary";
+            case WorkshopManager.Models.ServiceOrderStatus.WTrakcie:
+                return "bg-warning text-dark";
+            case WorkshopManager.Models.ServiceOrderStatus.Zakonczone:
+                return "bg-success";
+            case WorkshopManager.Models.ServiceOrderStatus.Anulowane:
+                return "bg-danger";
+            default:
+                return "bg-secondary";
+        }
+    }
 }
 
 <h2>Szczegóły zlecenia serwisowego</h2>
@@ -28,38 +51,24 @@
                         <dt class="col-sm-4">Data zamknięcia:</dt>
                         <dd class="col-sm-8">@Model.ClosedAt.Value.ToString("dd.MM.yyyy HH:mm")</dd>
                     }
+                    
+                    <dt class="col-sm-4">Opis problemu:</dt>
+                    <dd class="col-sm-8">@Model.ProblemDescription</dd>
                 </dl>
             </div>
         </div>
 
         <div class="card mb-4">
             <div class="card-header">
-                <h5>Klient i pojazd</h5>
+                <h5>Dane pojazdu</h5>
             </div>
             <div class="card-body">
                 <dl class="row">
-                    <dt class="col-sm-4">Klient:</dt>
-                    <dd class="col-sm-8">
-                        @((Model.Vehicle?.Customer?.FirstName + " " + Model.Vehicle?.Customer?.LastName).Trim() ?? "Brak danych klienta")
-                        @if (Model.Vehicle?.Customer != null)
-                        {
-                            <a asp-controller="Receptionist" asp-action="ClientDetails" asp-route-id="@Model.Vehicle.CustomerId" class="btn btn-outline-info btn-sm ms-2">
-                                Profil
-                            </a>
-                        }
-                    </dd>
+                    <dt class="col-sm-4">Marka:</dt>
+                    <dd class="col-sm-8">@Model.Vehicle?.Brand</dd>
                     
-                    <dt class="col-sm-4">Kontakt:</dt>
-                    <dd class="col-sm-8">
-                        @Model.Vehicle?.Customer?.Phone
-                        @if (!string.IsNullOrEmpty(Model.Vehicle?.Customer?.IdentityUser?.Email))
-                        {
-                            <span class="ms-2">@Model.Vehicle?.Customer?.IdentityUser?.Email</span>
-                        }
-                    </dd>
-                    
-                    <dt class="col-sm-4">Pojazd:</dt>
-                    <dd class="col-sm-8">@(Model.Vehicle?.Brand + " " + Model.Vehicle?.Model)</dd>
+                    <dt class="col-sm-4">Model:</dt>
+                    <dd class="col-sm-8">@Model.Vehicle?.Model</dd>
                     
                     <dt class="col-sm-4">Nr rejestracyjny:</dt>
                     <dd class="col-sm-8">@Model.Vehicle?.RegistrationNumber</dd>
@@ -70,140 +79,163 @@
             </div>
         </div>
 
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>Szczegóły zlecenia</h5>
-            </div>
-            <div class="card-body">
-                <dl class="row">
-                    <dt class="col-sm-4">Mechanik:</dt>
-                    <dd class="col-sm-8">
-                        @(Model.AssignedMechanic?.UserName ?? "Nie przypisano mechanika")
-                    </dd>
-                    
-                    <dt class="col-sm-4">Opis problemu:</dt>
-                    <dd class="col-sm-8">
-                        <p>@Model.ProblemDescription</p>
-                    </dd>
-                </dl>
-            </div>
-        </div>
-
-        @if (Model.ServiceTasks != null && Model.ServiceTasks.Any())
+        @if (!isClient)
         {
-            decimal totalLaborCost = Model.ServiceTasks.Sum(t => t.LaborCost);
-            decimal totalPartsCost = 0;
-            
-            // Obliczanie kosztu części
-            foreach (var task in Model.ServiceTasks)
+            @* Sekcje widoczne tylko dla recepcjonisty i mechanika *@
+            @if (isReceptionist)
             {
-                if (task.UsedParts != null)
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Dane klienta</h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-4">Imię i nazwisko:</dt>
+                            <dd class="col-sm-8">@((Model.Vehicle?.Customer?.FirstName + " " + Model.Vehicle?.Customer?.LastName).Trim())</dd>
+                            
+                            <dt class="col-sm-4">Telefon:</dt>
+                            <dd class="col-sm-8">@Model.Vehicle?.Customer?.Phone</dd>
+                        </dl>
+                    </div>
+                </div>
+            }
+
+            @if (isReceptionist && Model.AssignedMechanic != null)
+            {
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Przypisany mechanik</h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-4">Login:</dt>
+                            <dd class="col-sm-8">@Model.AssignedMechanic.UserName</dd>
+                        </dl>
+                    </div>
+                </div>
+            }
+
+            @if (Model.ServiceTasks != null && Model.ServiceTasks.Any())
+            {
+                decimal totalLaborCost = Model.ServiceTasks.Sum(t => t.LaborCost);
+                decimal totalPartsCost = 0;
+                
+                // Obliczanie kosztu części
+                foreach (var task in Model.ServiceTasks)
                 {
-                    foreach (var usedPart in task.UsedParts)
+                    if (task.UsedParts != null)
                     {
-                        if (usedPart.Part != null)
+                        foreach (var usedPart in task.UsedParts)
                         {
-                            totalPartsCost += usedPart.Part.UnitPrice * usedPart.Quantity;
+                            if (usedPart.Part != null)
+                            {
+                                totalPartsCost += usedPart.Part.UnitPrice * usedPart.Quantity;
+                            }
                         }
                     }
                 }
-            }
-            
-            decimal totalCost = totalLaborCost + totalPartsCost;
-            
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5>Podsumowanie kosztów</h5>
+                
+                decimal totalCost = totalLaborCost + totalPartsCost;
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Podsumowanie kosztów</h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-4">Koszt robocizny:</dt>
+                            <dd class="col-sm-8">@totalLaborCost.ToString("C")</dd>
+                            
+                            <dt class="col-sm-4">Koszt części:</dt>
+                            <dd class="col-sm-8">@totalPartsCost.ToString("C")</dd>
+                            
+                            <dt class="col-sm-4 fw-bold">Łączny koszt:</dt>
+                            <dd class="col-sm-8 fw-bold">@totalCost.ToString("C")</dd>
+                        </dl>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <dl class="row">
-                        <dt class="col-sm-4">Koszt robocizny:</dt>
-                        <dd class="col-sm-8">@totalLaborCost.ToString("C")</dd>
-                        
-                        <dt class="col-sm-4">Koszt części:</dt>
-                        <dd class="col-sm-8">@totalPartsCost.ToString("C")</dd>
-                        
-                        <dt class="col-sm-4 fw-bold">Łączny koszt:</dt>
-                        <dd class="col-sm-8 fw-bold">@totalCost.ToString("C")</dd>
-                    </dl>
-                </div>
-            </div>
-            
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5>Wykonane czynności serwisowe</h5>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group">
-                        @foreach (var task in Model.ServiceTasks)
-                        {
-                            <li class="list-group-item">
-                                <h6>@task.Description</h6>
-                                <p>Koszt robocizny: @task.LaborCost.ToString("C")</p>
-                                @if (task.UsedParts != null && task.UsedParts.Any())
-                                {
-                                    <div class="mt-2">
-                                        <strong>Użyte części:</strong>
-                                        <ul>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Wykonane czynności serwisowe</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            @foreach (var task in Model.ServiceTasks)
+                            {
+                                <li class="list-group-item">
+                                    <strong>@task.Description</strong>
+                                    @if (task.LaborCost > 0)
+                                    {
+                                        <span class="text-muted"> (robocizna: @task.LaborCost.ToString("C"))</span>
+                                    }
+                                    @if (task.UsedParts != null && task.UsedParts.Any())
+                                    {
+                                        <ul class="mt-2">
                                             @foreach (var part in task.UsedParts)
                                             {
-                                                decimal partCost = (part.Part?.UnitPrice ?? 0) * part.Quantity;
                                                 <li>
-                                                    @part.Part?.Name (@part.Quantity szt.) - 
-                                                    @((part.Part?.UnitPrice ?? 0).ToString("C")) za szt. = 
-                                                    @partCost.ToString("C")
+                                                    @part.Part?.Name x @part.Quantity
+                                                    @if (part.Part != null)
+                                                    {
+                                                        <span class="text-muted">(@part.Part.UnitPrice.ToString("C") za szt.)</span>
+                                                    }
                                                 </li>
                                             }
                                         </ul>
-                                    </div>
-                                }
-                            </li>
-                        }
-                    </ul>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    </div>
                 </div>
-            </div>
+            }
         }
-
-        @if (Model.Comments != null && Model.Comments.Any())
-        {
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5>Komentarze</h5>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group">
-                        @foreach (var comment in Model.Comments)
-                        {
-                            <li class="list-group-item">
-                                <p>@comment.Content</p>
-                                <div class="d-flex justify-content-between">
-                                    <small class="text-muted">@comment.Author?.UserName</small>
-                                    <small class="text-muted">@comment.Timestamp.ToString("dd.MM.yyyy HH:mm")</small>
-                                </div>
-                            </li>
-                        }
-                    </ul>
-                </div>
-            </div>
-        }
-
-        <div class="mt-3 d-flex gap-2">
-            <a asp-controller="ServiceOrder" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edytuj zlecenie</a>
-            <a asp-controller="Receptionist" asp-action="Panel" class="btn btn-secondary">Powrót do panelu recepcjonisty</a>
-        </div>
     </div>
 </div>
 
-@functions {
-    string GetStatusBadgeClass(ServiceOrderStatus status)
-    {
-        return status switch
+<hr />
+<h4>Komentarze</h4>
+@if (Model.Comments != null && Model.Comments.Any())
+{
+    <ul class="list-group mb-3">
+        @foreach (var comment in Model.Comments.OrderByDescending(c => c.Timestamp))
         {
-            ServiceOrderStatus.Nowe => "bg-primary",
-            ServiceOrderStatus.WTrakcie => "bg-warning",
-            ServiceOrderStatus.Zakonczone => "bg-success",
-            ServiceOrderStatus.Anulowane => "bg-danger",
-            _ => "bg-secondary"
-        };
-    }
+            var role = ((IDictionary<string, string>)ViewBag.CommentRoles).ContainsKey(comment.AuthorId) ? ((IDictionary<string, string>)ViewBag.CommentRoles)[comment.AuthorId] : "Brak roli";
+            string badgeClass = "bg-secondary";
+            if (role.ToLower() == "mechanik") badgeClass = "bg-purple text-white";
+            else if (role.ToLower() == "klient") badgeClass = "bg-info text-white";
+            else if (role.ToLower() == "recepcjonista") badgeClass = "bg-warning text-dark";
+            else if (role.ToLower() == "admin") badgeClass = "bg-danger";
+            <li class="list-group-item position-relative">
+                <div>
+                    <span class="badge @badgeClass align-middle" style="margin-right:8px;">@role</span>
+                    <strong>@comment.Author?.UserName</strong>
+                    <span class="text-muted small">@comment.Timestamp.ToString("dd.MM.yyyy HH:mm")</span>
+                </div>
+                <div>@comment.Content</div>
+                @if (comment.AuthorId == UserManager.GetUserId(User))
+                {
+                    <div style="position: absolute; right: 10px; bottom: 10px; z-index: 2;">
+                        <a asp-action="EditComment" asp-route-id="@comment.Id" class="btn btn-outline-secondary btn-xs" style="font-size: 0.85em; opacity: 0.7; padding: 2px 8px; margin-right: 4px;">Edytuj</a>
+                        <form asp-action="DeleteComment" asp-route-id="@comment.Id" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-outline-danger btn-xs" style="font-size: 0.85em; opacity: 0.7; padding: 2px 8px;" onclick="return confirm('Na pewno usunąć komentarz?')">Usuń</button>
+                        </form>
+                    </div>
+                }
+            </li>
+        }
+    </ul>
 }
+else
+{
+    <p>Brak komentarzy.</p>
+}
+<form asp-action="AddComment" method="post">
+    <input type="hidden" name="orderId" value="@Model.Id" />
+    <div class="form-group">
+        <label for="newComment">Dodaj komentarz:</label>
+        <textarea id="newComment" name="content" class="form-control" rows="3" maxlength="1000" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Dodaj</button>
+</form>
