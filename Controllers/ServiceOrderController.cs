@@ -248,6 +248,7 @@ namespace WorkshopManager.Controllers
             if (!string.IsNullOrWhiteSpace(content))
             {
                 comment.Content = content;
+                comment.ModifiedAt = DateTime.Now;
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction("Details", new { id = comment.ServiceOrderId });

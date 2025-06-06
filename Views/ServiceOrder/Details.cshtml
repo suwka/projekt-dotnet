@@ -212,6 +212,10 @@
                     <span class="badge @badgeClass align-middle" style="margin-right:8px;">@role</span>
                     <strong>@comment.Author?.UserName</strong>
                     <span class="text-muted small">@comment.Timestamp.ToString("dd.MM.yyyy HH:mm")</span>
+                    @if(comment.ModifiedAt.HasValue)
+                    {
+                        <span class="text-muted small"> (edytowano: @comment.ModifiedAt.Value.ToString("dd.MM.yyyy HH:mm"))</span>
+                    }
                 </div>
                 <div>@comment.Content</div>
                 @if (comment.AuthorId == UserManager.GetUserId(User))
