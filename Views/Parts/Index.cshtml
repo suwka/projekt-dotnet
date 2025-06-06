@@ -1,0 +1,38 @@
+@model IEnumerable<WorkshopManager.Models.Part>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<IdentityUser> SignInManager
+@{
+    ViewData["Title"] = "Części w warsztacie";
+}
+
+<h2>Części w warsztacie samochodowym</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nazwa części</th>
+            <th>Producent</th>
+            <th>Kod katalogowy</th>
+            <th>Ilość na stanie</th>
+            <th>Cena jednostkowa</th>
+            <th>Opis</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var part in Model)
+    {
+        <tr>
+            <td>@part.Id</td>
+            <td>@part.Name</td>
+            <td>@part.Manufacturer</td>
+            <td>@part.CatalogNumber</td>
+            <td>@part.Quantity</td>
+            <td>@part.UnitPrice.ToString("C")</td>
+            <td>@part.Description</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
