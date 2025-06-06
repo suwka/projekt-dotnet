@@ -56,6 +56,7 @@ else
                 <th>Rok produkcji</th>
                 <th>Status zlecenia</th>
                 <th>Opis problemu</th>
+                <th>Akcje</th>
             </tr>
         </thead>
         <tbody>
@@ -70,6 +71,12 @@ else
                 <td>@vehicle.Year</td>
                 <td>@order?.Status</td>
                 <td>@order?.ProblemDescription</td>
+                <td>
+                    @if (order != null)
+                    {
+                        <a asp-controller="ServiceOrder" asp-action="Details" asp-route-id="@order.Id" class="btn btn-info btn-sm">Szczegóły</a>
+                    }
+                </td>
             </tr>
         }
         </tbody>
