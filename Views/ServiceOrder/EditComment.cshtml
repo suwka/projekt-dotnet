@@ -1,0 +1,34 @@
+@model WorkshopManager.Models.Comment
+@{
+    ViewData["Title"] = "Edycja komentarza";
+}
+
+<h2>Edycja komentarza</h2>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Edytuj treść komentarza</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="EditComment" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="form-group">
+                        <label asp-for="Content">Treść komentarza:</label>
+                        <textarea asp-for="Content" class="form-control" rows="5" maxlength="1000" required></textarea>
+                        <span asp-validation-for="Content" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mt-3">
+                        <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+                        <a asp-action="Details" asp-route-id="@Model.ServiceOrderId" class="btn btn-secondary">Anuluj</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

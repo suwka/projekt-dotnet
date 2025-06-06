@@ -19,6 +19,8 @@ namespace WorkshopManager.Models
 
         [Required]
         public DateTime Timestamp { get; set; }
+        
+        public DateTime? ModifiedAt { get; set; }
 
         [Required]
         public int ServiceOrderId { get; set; }
