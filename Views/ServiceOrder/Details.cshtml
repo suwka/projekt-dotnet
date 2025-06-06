@@ -201,13 +201,20 @@
     <ul class="list-group mb-3">
         @foreach (var comment in Model.Comments.OrderByDescending(c => c.Timestamp))
         {
+            var role = ((IDictionary<string, string>)ViewBag.CommentRoles).ContainsKey(comment.AuthorId) ? ((IDictionary<string, string>)ViewBag.CommentRoles)[comment.AuthorId] : "Brak roli";
+            string badgeClass = "bg-secondary";
+            if (role.ToLower() == "mechanik") badgeClass = "bg-purple text-white";
+            else if (role.ToLower() == "klient") badgeClass = "bg-info text-white";
+            else if (role.ToLower() == "recepcjonista") badgeClass = "bg-warning text-dark";
+            else if (role.ToLower() == "admin") badgeClass = "bg-danger";
             <li class="list-group-item position-relative">
                 <div>
+                    <span class="badge @badgeClass align-middle" style="margin-right:8px;">@role</span>
                     <strong>@comment.Author?.UserName</strong>
                     <span class="text-muted small">@comment.Timestamp.ToString("dd.MM.yyyy HH:mm")</span>
                 </div>
                 <div>@comment.Content</div>
-                @if (User.Identity.IsAuthenticated && comment.AuthorId == UserManager.GetUserId(User))
+                @if (comment.AuthorId == UserManager.GetUserId(User))
                 {
                     <div style="position: absolute; right: 10px; bottom: 10px; z-index: 2;">
                         <a asp-action="EditComment" asp-route-id="@comment.Id" class="btn btn-outline-secondary btn-xs" style="font-size: 0.85em; opacity: 0.7; padding: 2px 8px; margin-right: 4px;">Edytuj</a>
@@ -222,33 +229,13 @@
 }
 else
 {
-    <p class="text-muted">Brak komentarzy.</p>
+    <p>Brak komentarzy.</p>
 }
-@if (User.Identity.IsAuthenticated)
-{
-    <form asp-action="AddComment" method="post" class="mb-3">
-        <input type="hidden" name="orderId" value="@Model.Id" />
-        <div class="mb-2">
-            <textarea name="content" class="form-control" rows="2" maxlength="1000" required placeholder="Dodaj komentarz..."></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary btn-sm">Dodaj komentarz</button>
-    </form>
-}
-<div class="mt-3">
-    @if (isMechanic)
-    {
-        <a asp-controller="Mechanic" asp-action="Panel" class="btn btn-secondary">Powrót do panelu mechanika</a>
-    }
-    else if (isReceptionist)
-    {
-        <a asp-controller="Receptionist" asp-action="Panel" class="btn btn-secondary">Powrót do panelu recepcjonisty</a>
-    }
-    else if (isClient)
-    {
-        <a asp-controller="Client" asp-action="Panel" class="btn btn-secondary">Powrót do panelu klienta</a>
-    }
-    else
-    {
-        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Powrót</a>
-    }
-</div>
+<form asp-action="AddComment" method="post">
+    <input type="hidden" name="orderId" value="@Model.Id" />
+    <div class="form-group">
+        <label for="newComment">Dodaj komentarz:</label>
+        <textarea id="newComment" name="content" class="form-control" rows="3" maxlength="1000" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Dodaj</button>
+</form>

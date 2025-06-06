@@ -89,6 +89,26 @@ namespace WorkshopManager.Controllers
                 return NotFound();
             }
 
+            // Najprostsze rozwiązanie: słownik AuthorId => rola (pierwsza rola)
+            var commentRoles = new Dictionary<string, string>();
+            foreach (var comment in serviceOrder.Comments)
+            {
+                if (comment.AuthorId != null && !commentRoles.ContainsKey(comment.AuthorId))
+                {
+                    var user = await _userManager.FindByIdAsync(comment.AuthorId);
+                    if (user != null)
+                    {
+                        var roles = await _userManager.GetRolesAsync(user);
+                        commentRoles[comment.AuthorId] = roles.FirstOrDefault() ?? "Brak roli";
+                    }
+                    else
+                    {
+                        commentRoles[comment.AuthorId] = "Brak użytkownika";
+                    }
+                }
+            }
+            ViewBag.CommentRoles = commentRoles;
+
             return View(serviceOrder);
         }
 
