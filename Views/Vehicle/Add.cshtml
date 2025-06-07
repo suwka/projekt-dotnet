@@ -22,7 +22,7 @@
 
 <div class="text-danger" asp-validation-summary="All"></div>
 
-<form asp-controller="Vehicle" asp-action="Add" method="post">
+<form asp-controller="Vehicle" asp-action="Add" method="post" enctype="multipart/form-data">
     @if (isReceptionist)
     {
         <div class="card mb-4">
@@ -83,7 +83,13 @@
         <input type="number" id="Year" name="Year" class="form-control" value="@year" />
         <span class="text-danger field-validation-error">@errors.GetValueOrDefault("Year", "")</span>
     </div>
-    <div class="form-group">
+    <div class="form-group mb-3">
+        <label for="VehiclePhoto">Zdjęcie pojazdu</label>
+        <input type="file" id="VehiclePhoto" name="VehiclePhoto" class="form-control" accept="image/*" />
+        <small class="form-text text-muted">Dopuszczalne formaty: JPG, PNG, GIF (max 5MB)</small>
+        <span class="text-danger field-validation-error">@errors.GetValueOrDefault("VehiclePhoto", "")</span>
+    </div>
+    <div class="form-group" style="display:none;">
         <label for="ImageUrl">URL obrazka</label>
         <input type="text" id="ImageUrl" name="ImageUrl" class="form-control" value="@imageUrl" />
         <span class="text-danger field-validation-error">@errors.GetValueOrDefault("ImageUrl", "")</span>

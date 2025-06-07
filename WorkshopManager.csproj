@@ -16,6 +16,7 @@
     <Folder Include="Views\Parts\" />
     <Folder Include="Views\Receptionist\" />
     <Folder Include="wwwroot\uploads\" />
+    <Folder Include="wwwroot\uploads\vehicles\" />
   </ItemGroup>
 
   <ItemGroup>

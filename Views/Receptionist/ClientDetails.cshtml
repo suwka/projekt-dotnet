@@ -41,7 +41,7 @@
                     <td>@vehicle.Vin</td>
                     <td>
                         <a asp-controller="ServiceOrder" asp-action="Create" asp-route-vehicleId="@vehicle.Id" class="btn btn-success btn-sm">Utwórz Zlecenie</a>
-                        @* Można dodać link do edycji pojazdu, jeśli taka funkcjonalność istnieje *@
+                        <a asp-controller="Vehicle" asp-action="Edit" asp-route-id="@vehicle.Id" class="btn btn-secondary btn-sm">Edytuj</a>
                     </td>
                 </tr>
             }

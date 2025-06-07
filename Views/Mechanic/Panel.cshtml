@@ -9,8 +9,16 @@
     <a asp-controller="Parts" asp-action="Index" class="btn btn-success">Części w warsztacie</a>
     <a asp-controller="Parts" asp-action="OrderParts" class="btn btn-warning">Zamów część</a>
     <a asp-controller="Parts" asp-action="PartOrders" class="btn btn-info">Zamówione części</a>
-
 </div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
 
 @if (!Model.Any())
 {
@@ -26,7 +34,7 @@ else
                 <th>Data utworzenia</th>
                 <th>Opis problemu</th>
                 <th>Pojazd</th>
-                <th>Szczegóły</th>
+                <th>Akcje</th>
             </tr>
         </thead>
         <tbody>
@@ -37,9 +45,23 @@ else
                 <td>@order.Status</td>
                 <td>@order.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
                 <td>@order.ProblemDescription</td>
-                <td>@order.VehicleId</td>
+                <td>@(order.Vehicle != null ? $"{order.Vehicle.Brand} {order.Vehicle.Model}" : "Brak danych")</td>
                 <td>
                     <a asp-controller="ServiceOrder" asp-action="Details" asp-route-id="@order.Id" class="btn btn-primary btn-sm">Szczegóły</a>
+                    @if (order.Status == ServiceOrderStatus.Nowe)
+                    {
+                        <form asp-action="StartOrder" asp-route-id="@order.Id" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-success btn-sm">Rozpocznij</button>
+                        </form>
+                    }
+                    @if (order.Status == ServiceOrderStatus.WTrakcie)
+                    {
+                        <form asp-action="CompleteOrder" asp-route-id="@order.Id" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-info btn-sm">Zakończ</button>
+                        </form>
+                    }
                 </td>
             </tr>
         }
