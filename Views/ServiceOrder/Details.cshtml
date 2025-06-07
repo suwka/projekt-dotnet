@@ -224,5 +224,30 @@
             <button type="submit" class="btn btn-primary mt-2">Dodaj</button>
         </form>
     </div>
+
+    <div class="col-md-4">
+        @* Pasek boczny, jeśli potrzebny *@
+    </div>
 </div>
 
+<div class="mt-4">
+    @if (isMechanic)
+    {
+        <a asp-controller="Mechanic" asp-action="Panel" class="btn btn-secondary">Powrót do panelu mechanika</a>
+    }
+    @if (isReceptionist)
+    {
+        <a asp-controller="Receptionist" asp-action="Panel" class="btn btn-secondary">Powrót do panelu recepcjonisty</a>
+        <a asp-controller="Receptionist" asp-action="ClientDetails" asp-route-id="@Model.Vehicle.CustomerId" class="btn btn-info">Szczegóły klienta</a>
+    }
+    @if (isClient)
+    {
+        <a asp-controller="Client" asp-action="Panel" class="btn btn-secondary">Powrót do panelu klienta</a>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Skrypt do obsługi modala edycji kosztu usługi, jeśli jest potrzebny
+    </script>
+}
