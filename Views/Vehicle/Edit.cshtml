@@ -18,42 +18,62 @@
 
 <div class="text-danger" asp-validation-summary="ModelOnly"></div>
 
-<form asp-controller="Vehicle" asp-action="Edit" asp-route-id="@Model.Id" method="post">
+<div class="row mb-4">
+    <div class="col-md-6">
+        <!-- Wyświetlanie aktualnego zdjęcia pojazdu -->
+        <div class="card">
+            <div class="card-header">
+                <h5>Aktualne zdjęcie pojazdu</h5>
+            </div>
+            <div class="card-body text-center">
+                <img src="@Model.ImageUrl" alt="Zdjęcie pojazdu @Model.Brand @Model.Model" class="img-fluid" style="max-height: 200px;" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<form asp-controller="Vehicle" asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="Id" />
     <input type="hidden" asp-for="CustomerId" />
 
-    <div class="form-group">
+    <div class="form-group mb-3">
         <label asp-for="Brand">Marka</label>
         <input asp-for="Brand" class="form-control" />
         <span asp-validation-for="Brand" class="text-danger"></span>
         <span class="text-danger field-validation-error">@errors.GetValueOrDefault("Brand", "")</span>
     </div>
-    <div class="form-group">
+    <div class="form-group mb-3">
         <label asp-for="Model">Model</label>
         <input asp-for="Model" class="form-control" />
         <span asp-validation-for="Model" class="text-danger"></span>
         <span class="text-danger field-validation-error">@errors.GetValueOrDefault("Model", "")</span>
     </div>
-    <div class="form-group">
+    <div class="form-group mb-3">
         <label asp-for="Vin">VIN</label>
         <input asp-for="Vin" class="form-control" />
         <span asp-validation-for="Vin" class="text-danger"></span>
         <span class="text-danger field-validation-error">@errors.GetValueOrDefault("Vin", "")</span>
     </div>
-    <div class="form-group">
+    <div class="form-group mb-3">
         <label asp-for="RegistrationNumber">Numer rejestracyjny</label>
         <input asp-for="RegistrationNumber" class="form-control" />
         <span asp-validation-for="RegistrationNumber" class="text-danger"></span>
         <span class="text-danger field-validation-error">@errors.GetValueOrDefault("RegistrationNumber", "")</span>
     </div>
-    <div class="form-group">
+    <div class="form-group mb-3">
         <label asp-for="Year">Rok produkcji</label>
         <input asp-for="Year" type="number" class="form-control" />
         <span asp-validation-for="Year" class="text-danger"></span>
         <span class="text-danger field-validation-error">@errors.GetValueOrDefault("Year", "")</span>
     </div>
-    <div class="form-group">
+    <div class="form-group mb-3">
+        <label for="VehiclePhoto">Zmień zdjęcie pojazdu</label>
+        <input type="file" id="VehiclePhoto" name="VehiclePhoto" class="form-control" accept="image/*" />
+        <small class="form-text text-muted">Dopuszczalne formaty: JPG, PNG, GIF (max 5MB)</small>
+        <span class="text-danger field-validation-error">@errors.GetValueOrDefault("VehiclePhoto", "")</span>
+    </div>
+    <div class="form-group mb-3" style="display:none;">
         <label asp-for="ImageUrl">URL obrazka</label>
         <input asp-for="ImageUrl" class="form-control" />
         <span asp-validation-for="ImageUrl" class="text-danger"></span>
