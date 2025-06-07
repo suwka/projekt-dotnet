@@ -1,28 +1,50 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Strona główna";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Witamy w Warsztacie Samochodowym!</h1>
+    <p>
+        Nasz warsztat oferuje kompleksowe usługi naprawy i serwisu samochodów. Dbamy o Twój pojazd, zapewniając profesjonalną obsługę, szybkie terminy i indywidualne podejście do każdego klienta.
+    </p>
+    <p>
+        Zaloguj się, aby uzyskać dostęp do swojego panelu i korzystać z dodatkowych funkcji.
+    </p>
     @if (User.Identity.IsAuthenticated)
     {
         if (User.IsInRole("Admin"))
         {
-            <a class="btn btn-primary mt-3" href="/Admin/Panel">Panel</a>
+            <div class="alert alert-info mt-3">
+                Witaj, Administratorze! Zarządzaj warsztatem i użytkownikami.
+            </div>
+            <a class="btn btn-primary mt-2" href="/Admin/Panel">Przejdź do panelu administratora</a>
         }
         else if (User.IsInRole("Recepcjonista"))
         {
-            <a class="btn btn-primary mt-3" href="/Receptionist/Panel">Panel</a>
+            <div class="alert alert-info mt-3">
+                Witaj, Recepcjonisto! Obsługuj klientów i zarządzaj zleceniami.
+            </div>
+            <a class="btn btn-primary mt-2" href="/Receptionist/Panel">Przejdź do panelu recepcjonisty</a>
         }
         else if (User.IsInRole("Mechanik"))
         {
-            <a class="btn btn-primary mt-3" href="/Mechanic/Panel">Panel</a>
+            <div class="alert alert-info mt-3">
+                Witaj, Mechaniku! Sprawdzaj i realizuj zlecenia napraw.
+            </div>
+            <a class="btn btn-primary mt-2" href="/Mechanic/Panel">Przejdź do panelu mechanika</a>
         }
         else if (User.IsInRole("Klient"))
         {
-            <a class="btn btn-primary mt-3" href="/Client/Panel">Panel</a>
+            <div class="alert alert-info mt-3">
+                Witaj, Kliencie! Sprawdź status swoich zleceń i historię napraw.
+            </div>
+            <a class="btn btn-primary mt-2" href="/Client/Panel">Przejdź do panelu klienta</a>
         }
     }
+    else
+    {
+        <div class="alert alert-secondary mt-3">
+            Nie jesteś zalogowany. Zaloguj się, aby uzyskać dostęp do swojego panelu.
+        </div>
+    }
 </div>
-
