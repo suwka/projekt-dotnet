@@ -1,0 +1,79 @@
+@model WorkshopManager.Models.Vehicle
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@inject UserManager<IdentityUser> UserManager
+@{
+    ViewData["Title"] = "Edytuj pojazd";
+    var errors = ViewData["Errors"] as Dictionary<string, string> ?? new Dictionary<string, string>();
+    var isReceptionist = User.IsInRole("Recepcjonista");
+    var customerName = ViewBag.CustomerName as string;
+}
+
+<h2>Edytuj pojazd</h2>
+
+@if (!string.IsNullOrEmpty(customerName))
+{
+    <p>Edytujesz pojazd dla klienta: <strong>@customerName</strong></p>
+}
+
+<div class="text-danger" asp-validation-summary="ModelOnly"></div>
+
+<form asp-controller="Vehicle" asp-action="Edit" asp-route-id="@Model.Id" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="CustomerId" />
+
+    <div class="form-group">
+        <label asp-for="Brand">Marka</label>
+        <input asp-for="Brand" class="form-control" />
+        <span asp-validation-for="Brand" class="text-danger"></span>
+        <span class="text-danger field-validation-error">@errors.GetValueOrDefault("Brand", "")</span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Model">Model</label>
+        <input asp-for="Model" class="form-control" />
+        <span asp-validation-for="Model" class="text-danger"></span>
+        <span class="text-danger field-validation-error">@errors.GetValueOrDefault("Model", "")</span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Vin">VIN</label>
+        <input asp-for="Vin" class="form-control" />
+        <span asp-validation-for="Vin" class="text-danger"></span>
+        <span class="text-danger field-validation-error">@errors.GetValueOrDefault("Vin", "")</span>
+    </div>
+    <div class="form-group">
+        <label asp-for="RegistrationNumber">Numer rejestracyjny</label>
+        <input asp-for="RegistrationNumber" class="form-control" />
+        <span asp-validation-for="RegistrationNumber" class="text-danger"></span>
+        <span class="text-danger field-validation-error">@errors.GetValueOrDefault("RegistrationNumber", "")</span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Year">Rok produkcji</label>
+        <input asp-for="Year" type="number" class="form-control" />
+        <span asp-validation-for="Year" class="text-danger"></span>
+        <span class="text-danger field-validation-error">@errors.GetValueOrDefault("Year", "")</span>
+    </div>
+    <div class="form-group">
+        <label asp-for="ImageUrl">URL obrazka</label>
+        <input asp-for="ImageUrl" class="form-control" />
+        <span asp-validation-for="ImageUrl" class="text-danger"></span>
+        <span class="text-danger field-validation-error">@errors.GetValueOrDefault("ImageUrl", "")</span>
+    </div>
+
+    <div class="form-group mt-3">
+        <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+        @if (isReceptionist)
+        {
+            <a asp-controller="Receptionist" asp-action="ClientDetails" asp-route-id="@Model.CustomerId" class="btn btn-secondary">Anuluj</a>
+        }
+        else
+        {
+            <a asp-controller="Client" asp-action="Panel" class="btn btn-secondary">Anuluj</a>
+        }
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

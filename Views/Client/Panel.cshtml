@@ -34,7 +34,8 @@ else
                 <td>@vehicle.RegistrationNumber</td>
                 <td>@vehicle.Year</td>
                 <td>
-                    <a class="btn btn-primary" href="/ServiceOrder/Create?vehicleId=@vehicle.Id">Złóż zlecenie</a>
+                    <a class="btn btn-primary btn-sm" href="/ServiceOrder/Create?vehicleId=@vehicle.Id">Złóż zlecenie</a>
+                    <a class="btn btn-secondary btn-sm" asp-controller="Vehicle" asp-action="Edit" asp-route-id="@vehicle.Id">Edytuj</a>
                 </td>
             </tr>
         }

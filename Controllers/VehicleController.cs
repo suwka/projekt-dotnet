@@ -245,5 +245,166 @@ namespace WorkshopManager.Controllers
 
             return View(customer.Vehicles ?? new List<Vehicle>());
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var vehicle = await _context.Vehicles.Include(v => v.Customer).FirstOrDefaultAsync(v => v.Id == id);
+
+            if (vehicle == null)
+            {
+                return NotFound();
+            }
+
+            // Sprawdzenie uprawnień
+            if (User.IsInRole("Klient"))
+            {
+                var user = await _userManager.GetUserAsync(User);
+                var customer = await _context.Customers.FirstOrDefaultAsync(c => c.IdentityUserId == user.Id);
+                if (vehicle.CustomerId != customer.Id)
+                {
+                    return Forbid(); // Klient próbuje edytować nie swój pojazd
+                }
+            }
+            
+            if (vehicle.Customer != null)
+            {
+                ViewBag.CustomerName = $"{vehicle.Customer.FirstName} {vehicle.Customer.LastName}";
+            }
+
+            return View(vehicle);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, IFormCollection form)
+        {
+            var vehicleToUpdate = await _context.Vehicles.Include(v => v.Customer).FirstOrDefaultAsync(v => v.Id == id);
+
+            if (vehicleToUpdate == null)
+            {
+                return NotFound();
+            }
+
+            // Sprawdzenie uprawnień
+            if (User.IsInRole("Klient"))
+            {
+                var user = await _userManager.GetUserAsync(User);
+                var customer = await _context.Customers.FirstOrDefaultAsync(c => c.IdentityUserId == user.Id);
+                if (vehicleToUpdate.CustomerId != customer.Id)
+                {
+                    return Forbid();
+                }
+            }
+
+            var brand = form["Brand"].ToString();
+            var model = form["Model"].ToString();
+            var vin = form["Vin"].ToString();
+            var registrationNumber = form["RegistrationNumber"].ToString();
+            var yearString = form["Year"].ToString();
+            var imageUrl = form["ImageUrl"].ToString();
+            
+            var errorList = new Dictionary<string, string>();
+            bool isValid = true;
+
+            if (string.IsNullOrWhiteSpace(brand))
+            {
+                errorList["Brand"] = "Marka jest wymagana";
+                isValid = false;
+            }
+            if (string.IsNullOrWhiteSpace(model))
+            {
+                errorList["Model"] = "Model jest wymagany";
+                isValid = false;
+            }
+            if (string.IsNullOrWhiteSpace(vin) || vin.Length != 17)
+            {
+                errorList["Vin"] = "VIN jest wymagany i musi mieć 17 znaków";
+                isValid = false;
+            }
+            if (string.IsNullOrWhiteSpace(registrationNumber))
+            {
+                errorList["RegistrationNumber"] = "Numer rejestracyjny jest wymagany";
+                isValid = false;
+            }
+            int year = 0;
+            if (string.IsNullOrWhiteSpace(yearString) || !int.TryParse(yearString, out year))
+            {
+                errorList["Year"] = "Rok jest wymagany";
+                isValid = false;
+            }
+            if (string.IsNullOrWhiteSpace(imageUrl))
+            {
+                imageUrl = "https://via.placeholder.com/150";
+            }
+
+            ViewData["Errors"] = errorList;
+
+            if (!isValid)
+            {
+                // Przekazanie danych z powrotem do widoku w przypadku błędu
+                vehicleToUpdate.Brand = brand;
+                vehicleToUpdate.Model = model;
+                vehicleToUpdate.Vin = vin;
+                vehicleToUpdate.RegistrationNumber = registrationNumber;
+                if(int.TryParse(yearString, out int parsedYear)) vehicleToUpdate.Year = parsedYear;
+                vehicleToUpdate.ImageUrl = imageUrl;
+                if (vehicleToUpdate.Customer != null)
+                {
+                    ViewBag.CustomerName = $"{vehicleToUpdate.Customer.FirstName} {vehicleToUpdate.Customer.LastName}";
+                }
+                return View(vehicleToUpdate);
+            }
+
+            vehicleToUpdate.Brand = brand;
+            vehicleToUpdate.Model = model;
+            vehicleToUpdate.Vin = vin;
+            vehicleToUpdate.RegistrationNumber = registrationNumber;
+            vehicleToUpdate.Year = year;
+            vehicleToUpdate.ImageUrl = imageUrl;
+
+            if (ModelState.IsValid) // Dodatkowa walidacja modelu, jeśli używasz atrybutów
+            {
+                try
+                {
+                    _context.Update(vehicleToUpdate);
+                    await _context.SaveChangesAsync();
+
+                    if (User.IsInRole("Recepcjonista"))
+                    {
+                        return RedirectToAction("ClientDetails", "Receptionist", new { id = vehicleToUpdate.CustomerId });
+                    }
+                    return RedirectToAction("Panel", "Client");
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!VehicleExists(vehicleToUpdate.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error updating vehicle");
+                    ModelState.AddModelError("", "Wystąpił błąd podczas aktualizacji pojazdu.");
+                }
+            }
+            
+            // Jeśli ModelState nie jest ważny lub wystąpił inny błąd, wróć do widoku edycji
+            if (vehicleToUpdate.Customer != null)
+            {
+                ViewBag.CustomerName = $"{vehicleToUpdate.Customer.FirstName} {vehicleToUpdate.Customer.LastName}";
+            }
+            return View(vehicleToUpdate);
+        }
+
+        private bool VehicleExists(int id)
+        {
+            return _context.Vehicles.Any(e => e.Id == id);
+        }
     }
 }
