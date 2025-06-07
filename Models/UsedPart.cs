@@ -15,6 +15,9 @@ namespace WorkshopManager.Models
         [Range(1, int.MaxValue, ErrorMessage = "Ilość musi być większa od zera.")]
         public int Quantity { get; set; }
 
+        // Koszt usługi związany z daną częścią
+        public decimal? ServiceCost { get; set; }
+
         [Required]
         public int ServiceTaskId { get; set; }
         public ServiceTask ServiceTask { get; set; }
