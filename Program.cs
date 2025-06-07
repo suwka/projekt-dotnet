@@ -12,6 +12,10 @@ builder.Services.AddDbContext<WorkshopManager.Data.ApplicationDbContext>(options
 
 // Rejestracja własnych serwisów
 builder.Services.AddScoped<PdfService>();
+builder.Services.AddScoped<EmailService>();
+
+// Rejestracja usługi tła do generowania raportów
+builder.Services.AddHostedService<OpenOrderReportBackgroundService>();
 
 builder.Services.AddIdentity<Microsoft.AspNetCore.Identity.IdentityUser, Microsoft.AspNetCore.Identity.IdentityRole>(options =>
 {
@@ -51,7 +55,6 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();

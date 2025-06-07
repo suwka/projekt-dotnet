@@ -15,11 +15,13 @@
     <Folder Include="Views\Mechanic\" />
     <Folder Include="Views\Parts\" />
     <Folder Include="Views\Receptionist\" />
+    <Folder Include="wwwroot\reports\" />
     <Folder Include="wwwroot\uploads\" />
     <Folder Include="wwwroot\uploads\vehicles\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MailKit" Version="4.12.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.5">
