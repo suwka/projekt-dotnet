@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WorkshopManager.Models;
 using WorkshopManager.Data;
+using WorkshopManager.Services;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WorkshopManager.Controllers
 {
@@ -15,11 +17,16 @@ namespace WorkshopManager.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly PdfService _pdfService;
 
-        public ServiceOrderController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        public ServiceOrderController(
+            ApplicationDbContext context, 
+            UserManager<IdentityUser> userManager,
+            PdfService pdfService)
         {
             _context = context;
             _userManager = userManager;
+            _pdfService = pdfService;
         }
 
         // GET: /ServiceOrder/Create?vehicleId=5
@@ -549,9 +556,40 @@ namespace WorkshopManager.Controllers
             return RedirectToAction("Details", new { id = orderId });
         }
 
+        // GET: /ServiceOrder/DownloadPdf/5
+        [HttpGet]
+        [Authorize(Roles = "Recepcjonista, Admin")]
+        public async Task<IActionResult> DownloadPdf(int id)
+        {
+            // Pobierz dane zamówienia z bazy danych, uwzględniając wszystkie powiązane encje
+            var order = await _context.ServiceOrders
+                .Include(so => so.Vehicle)
+                .ThenInclude(v => v.Customer)
+                .Include(so => so.ServiceTasks)
+                .ThenInclude(st => st.UsedParts)
+                .ThenInclude(up => up.Part)
+                .FirstOrDefaultAsync(so => so.Id == id);
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            // Wygeneruj plik PDF
+            var pdfBytes = _pdfService.GenerateServiceOrderPdf(order);
+
+            // Zwróć plik do pobrania
+            return File(
+                pdfBytes, 
+                "application/pdf", 
+                $"zamowienie-serwisowe-{id}.pdf"
+            );
+        }
+        
         private bool ServiceOrderExists(int id)
         {
             return _context.ServiceOrders.Any(e => e.Id == id);
         }
     }
 }
+
