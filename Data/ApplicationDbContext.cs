@@ -20,6 +20,7 @@ namespace WorkshopManager.Data
         public DbSet<Part> Parts { get; set; }
         public DbSet<UsedPart> UsedParts { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<PartOrder> PartOrders { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -46,51 +47,51 @@ namespace WorkshopManager.Data
                 .HasOne(v => v.Customer)
                 .WithMany(c => c.Vehicles)
                 .HasForeignKey(v => v.CustomerId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.NoAction);
 
-            // Relacja Vehicle - ServiceOrder (1:N)
+            // Relacja ServiceOrder - Vehicle (N:1)
             modelBuilder.Entity<ServiceOrder>()
-                .HasOne(so => so.Vehicle)
-                .WithMany(v => v.ServiceOrders)
-                .HasForeignKey(so => so.VehicleId)
+                .HasOne(o => o.Vehicle)
+                .WithMany(v => v.ServiceOrders) // Poprawiona linia
+                .HasForeignKey(o => o.VehicleId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            // Relacja ServiceOrder - ServiceTask (1:N)
+                
+            // Relacje z ServiceTask - ServiceOrder
             modelBuilder.Entity<ServiceTask>()
                 .HasOne(st => st.ServiceOrder)
                 .WithMany(so => so.ServiceTasks)
                 .HasForeignKey(st => st.ServiceOrderId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // Relacja ServiceTask - UsedPart (1:N)
-            modelBuilder.Entity<UsedPart>()
-                .HasOne(up => up.ServiceTask)
-                .WithMany(st => st.UsedParts)
-                .HasForeignKey(up => up.ServiceTaskId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // Relacja Part - UsedPart (1:N)
+                .OnDelete(DeleteBehavior.NoAction);
+                
+            // Relacje UsedPart - Part
             modelBuilder.Entity<UsedPart>()
                 .HasOne(up => up.Part)
                 .WithMany(p => p.UsedParts)
                 .HasForeignKey(up => up.PartId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Relacja ServiceOrder - Comment (1:N)
+                .OnDelete(DeleteBehavior.NoAction);
+                
+            // Relacje UsedPart - ServiceTask
+            modelBuilder.Entity<UsedPart>()
+                .HasOne(up => up.ServiceTask)
+                .WithMany(st => st.UsedParts)
+                .HasForeignKey(up => up.ServiceTaskId)
+                .OnDelete(DeleteBehavior.NoAction);
+                
+            // Relacje Comment - ServiceOrder
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.ServiceOrder)
                 .WithMany(so => so.Comments)
                 .HasForeignKey(c => c.ServiceOrderId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Ustawienie precyzji dla decimal
+                .OnDelete(DeleteBehavior.NoAction);
+                
+            // Konfiguracja właściwości decimal dla dokładności
             modelBuilder.Entity<Part>()
                 .Property(p => p.UnitPrice)
                 .HasColumnType("decimal(18,2)");
+                
             modelBuilder.Entity<ServiceTask>()
-                .Property(st => st.LaborCost)
+                .Property(t => t.LaborCost)
                 .HasColumnType("decimal(18,2)");
         }
     }
 }
-

@@ -51,13 +51,35 @@ namespace WorkshopManager.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PartOrders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Brand = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Model = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PartNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PartOrders", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Parts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Manufacturer = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CatalogNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -213,8 +235,7 @@ namespace WorkshopManager.Migrations
                         name: "FK_Vehicles_Customers_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -224,10 +245,11 @@ namespace WorkshopManager.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    AssignedMechanicId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    AssignedMechanicId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: true),
                     VehicleId = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ClosedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    ClosedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ProblemDescription = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -236,8 +258,7 @@ namespace WorkshopManager.Migrations
                         name: "FK_ServiceOrders_AspNetUsers_AssignedMechanicId",
                         column: x => x.AssignedMechanicId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ServiceOrders_Vehicles_VehicleId",
                         column: x => x.VehicleId,
@@ -255,6 +276,7 @@ namespace WorkshopManager.Migrations
                     AuthorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ServiceOrderId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -270,8 +292,7 @@ namespace WorkshopManager.Migrations
                         name: "FK_Comments_ServiceOrders_ServiceOrderId",
                         column: x => x.ServiceOrderId,
                         principalTable: "ServiceOrders",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -291,8 +312,7 @@ namespace WorkshopManager.Migrations
                         name: "FK_ServiceTasks_ServiceOrders_ServiceOrderId",
                         column: x => x.ServiceOrderId,
                         principalTable: "ServiceOrders",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -312,14 +332,12 @@ namespace WorkshopManager.Migrations
                         name: "FK_UsedParts_Parts_PartId",
                         column: x => x.PartId,
                         principalTable: "Parts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_UsedParts_ServiceTasks_ServiceTaskId",
                         column: x => x.ServiceTaskId,
                         principalTable: "ServiceTasks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -439,6 +457,9 @@ namespace WorkshopManager.Migrations
 
             migrationBuilder.DropTable(
                 name: "Comments");
+
+            migrationBuilder.DropTable(
+                name: "PartOrders");
 
             migrationBuilder.DropTable(
                 name: "UsedParts");

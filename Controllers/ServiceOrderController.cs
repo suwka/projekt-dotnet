@@ -57,7 +57,20 @@ namespace WorkshopManager.Controllers
                 serviceOrder.Status = WorkshopManager.Models.ServiceOrderStatus.Nowe;
                 _context.ServiceOrders.Add(serviceOrder);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Panel", "Receptionist");
+                // Sprawdź rolę użytkownika i przekieruj odpowiednio
+                if (User.IsInRole("Recepcjonista"))
+                {
+                    return RedirectToAction("Panel", "Receptionist");
+                }
+                else if (User.IsInRole("Klient"))
+                {
+                    return RedirectToAction("Panel", "Client");
+                }
+                else
+                {
+                    // domyślne przekierowanie, np. do strony głównej
+                    return RedirectToAction("Index", "Home");
+                }
             }
             
             // Jeśli model jest nieprawidłowy, ponownie pobieramy dane do list wyboru

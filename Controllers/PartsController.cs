@@ -138,6 +138,66 @@ namespace WorkshopManager.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // GET: Parts/OrderParts
+        public IActionResult OrderParts()
+        {
+            return View();
+        }
+
+        // POST: Parts/OrderParts
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> OrderParts([Bind("Brand,Model,PartNumber,Quantity,Description")] PartOrder partOrder)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(partOrder);
+            }
+            partOrder.CreatedAt = DateTime.Now;
+            _context.PartOrders.Add(partOrder);
+            await _context.SaveChangesAsync();
+            TempData["OrderPartSuccess"] = "Zamówienie zostało złożone.";
+            return RedirectToAction("Panel", "Mechanic");
+        }
+
+        // GET: Parts/PartOrders
+        public async Task<IActionResult> PartOrders()
+        {
+            var orders = await _context.PartOrders.OrderByDescending(o => o.CreatedAt).ToListAsync();
+            return View(orders);
+        }
+
+        // GET: Parts/DeletePartOrder/5
+        [Authorize(Roles = "Admin,Recepcjonista")]
+        public async Task<IActionResult> DeletePartOrder(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var partOrder = await _context.PartOrders.FirstOrDefaultAsync(p => p.Id == id);
+            if (partOrder == null)
+            {
+                return NotFound();
+            }
+            return View(partOrder);
+        }
+
+        // POST: Parts/DeletePartOrder/5
+        [HttpPost, ActionName("DeletePartOrder")]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Recepcjonista")]
+        public async Task<IActionResult> DeletePartOrderConfirmed(int id)
+        {
+            var partOrder = await _context.PartOrders.FindAsync(id);
+            if (partOrder != null)
+            {
+                _context.PartOrders.Remove(partOrder);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction("PartOrders");
+        }
+
         private bool PartExists(int id)
         {
             return _context.Parts.Any(e => e.Id == id);

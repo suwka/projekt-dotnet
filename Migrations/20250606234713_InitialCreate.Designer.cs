@@ -12,8 +12,8 @@ using WorkshopManager.Data;
 namespace WorkshopManager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250527144425_AddProblemDescriptionToServiceOrder")]
-    partial class AddProblemDescriptionToServiceOrder
+    [Migration("20250606234713_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -240,6 +240,9 @@ namespace WorkshopManager.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("ServiceOrderId")
                         .HasColumnType("int");
 
@@ -296,10 +299,28 @@ namespace WorkshopManager.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("CatalogNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Manufacturer")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(18,2)");
@@ -307,6 +328,39 @@ namespace WorkshopManager.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Parts");
+                });
+
+            modelBuilder.Entity("WorkshopManager.Models.PartOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PartNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PartOrders");
                 });
 
             modelBuilder.Entity("WorkshopManager.Models.ServiceOrder", b =>
@@ -318,7 +372,7 @@ namespace WorkshopManager.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AssignedMechanicId")
-                        .IsRequired()
+                        .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("ClosedAt")
@@ -513,7 +567,7 @@ namespace WorkshopManager.Migrations
                     b.HasOne("WorkshopManager.Models.ServiceOrder", "ServiceOrder")
                         .WithMany("Comments")
                         .HasForeignKey("ServiceOrderId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Author");
@@ -536,9 +590,7 @@ namespace WorkshopManager.Migrations
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "AssignedMechanic")
                         .WithMany()
-                        .HasForeignKey("AssignedMechanicId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AssignedMechanicId");
 
                     b.HasOne("WorkshopManager.Models.Vehicle", "Vehicle")
                         .WithMany("ServiceOrders")
@@ -556,7 +608,7 @@ namespace WorkshopManager.Migrations
                     b.HasOne("WorkshopManager.Models.ServiceOrder", "ServiceOrder")
                         .WithMany("ServiceTasks")
                         .HasForeignKey("ServiceOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("ServiceOrder");
@@ -567,13 +619,13 @@ namespace WorkshopManager.Migrations
                     b.HasOne("WorkshopManager.Models.Part", "Part")
                         .WithMany("UsedParts")
                         .HasForeignKey("PartId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("WorkshopManager.Models.ServiceTask", "ServiceTask")
                         .WithMany("UsedParts")
                         .HasForeignKey("ServiceTaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Part");
@@ -586,7 +638,7 @@ namespace WorkshopManager.Migrations
                     b.HasOne("WorkshopManager.Models.Customer", "Customer")
                         .WithMany("Vehicles")
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Customer");

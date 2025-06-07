@@ -1,0 +1,45 @@
+@model WorkshopManager.Models.PartOrder
+@{
+    ViewData["Title"] = "Usuń zamówienie części";
+}
+
+<h2>Usuń zamówienie części</h2>
+
+<div class="alert alert-warning">
+    <strong>Czy na pewno chcesz usunąć to zamówienie?</strong>
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3">ID</dt>
+    <dd class="col-sm-9">@Model.Id</dd>
+    <dt class="col-sm-3">Marka</dt>
+    <dd class="col-sm-9">@Model.Brand</dd>
+    <dt class="col-sm-3">Model</dt>
+    <dd class="col-sm-9">@Model.Model</dd>
+    <dt class="col-sm-3">Nr części</dt>
+    <dd class="col-sm-9">@Model.PartNumber</dd>
+    <dt class="col-sm-3">Ilość</dt>
+    <dd class="col-sm-9">@Model.Quantity</dd>
+    <dt class="col-sm-3">Opis</dt>
+    <dd class="col-sm-9">@Model.Description</dd>
+    <dt class="col-sm-3">Data zamówienia</dt>
+    <dd class="col-sm-9">@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</dd>
+</dl>
+
+@if (User.IsInRole("Recepcjonista") || User.IsInRole("Admin"))
+{
+    <form asp-action="DeletePartOrder" method="post">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Usuń</button>
+        <a asp-action="PartOrders" class="btn btn-secondary">Anuluj</a>
+    </form>
+}
+
+@if (User.IsInRole("Mechanik"))
+{
+    <a asp-controller="Mechanic" asp-action="Panel" class="btn btn-secondary mt-3">Powrót do panelu</a>
+}
+else if (User.IsInRole("Recepcjonista"))
+{
+    <a asp-controller="Receptionist" asp-action="Panel" class="btn btn-secondary mt-3">Powrót do panelu</a>
+}

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkshopManager.Models
 {
@@ -14,6 +15,7 @@ namespace WorkshopManager.Models
 
         [Required]
         [Range(0, double.MaxValue, ErrorMessage = "Koszt robocizny musi być nieujemny.")]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal LaborCost { get; set; }
 
         [Required]

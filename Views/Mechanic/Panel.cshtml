@@ -7,7 +7,9 @@
 
 <div class="mb-3">
     <a asp-controller="Parts" asp-action="Index" class="btn btn-success">Części w warsztacie</a>
-    <a asp-controller="Parts" asp-action="Add" class="btn btn-primary">Dodaj część</a>
+    <a asp-controller="Parts" asp-action="OrderParts" class="btn btn-warning">Zamów część</a>
+    <a asp-controller="Parts" asp-action="PartOrders" class="btn btn-info">Zamówione części</a>
+
 </div>
 
 @if (!Model.Any())
@@ -44,3 +46,4 @@ else
         </tbody>
     </table>
 }
+
