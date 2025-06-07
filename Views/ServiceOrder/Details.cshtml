@@ -6,6 +6,7 @@
     var isMechanic = User.IsInRole("Mechanik");
     var isReceptionist = User.IsInRole("Recepcjonista");
     var isClient = User.IsInRole("Klient");
+    var isAdmin = User.IsInRole("Admin");
 }
 
 @functions {
@@ -28,6 +29,23 @@
 }
 
 <h2>Szczegóły zlecenia serwisowego</h2>
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="btn-group" role="group">
+            @if (isReceptionist || isAdmin)
+            {
+                <a asp-controller="ServiceOrder" asp-action="DownloadPdf" asp-route-id="@Model.Id" class="btn btn-primary">
+                    <i class="fas fa-file-pdf"></i> Pobierz raport PDF
+                </a>
+            }
+            @if (isReceptionist)
+            {
+                <a asp-controller="ServiceOrder" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-secondary ms-2">Edytuj zlecenie</a>
+            }
+        </div>
+    </div>
+</div>
 
 <div class="row">
     <div class="col-md-8">
