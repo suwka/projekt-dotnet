@@ -29,7 +29,50 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="NUnit" Version="3.14.0" />
     <PackageReference Include="QuestPDF" Version="2025.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\appsettings.Development.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\appsettings.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\TestProject1.deps.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\TestProject1.runtimeconfig.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\TestProject1\bin\Debug\net8.0\appsettings.Development.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\TestProject1\bin\Debug\net8.0\appsettings.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\TestProject1\bin\Debug\net8.0\TestProject1.deps.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\TestProject1\bin\Debug\net8.0\TestProject1.runtimeconfig.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\TestProject1\bin\Debug\net8.0\TestProject1\obj\project.assets.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\TestProject1\bin\Debug\net8.0\TestProject1\obj\project.packagespec.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\TestProject1\bin\Debug\net8.0\TestProject1\obj\TestProject1.csproj.nuget.dgspec.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\TestProject1\bin\Debug\net8.0\WorkshopManager.deps.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\TestProject1\bin\Debug\net8.0\WorkshopManager.runtimeconfig.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\TestProject1\bin\Debug\net8.0\WorkshopManager.staticwebassets.endpoints.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\TestProject1\bin\Debug\net8.0\WorkshopManager.staticwebassets.runtime.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\TestProject1\obj\Debug\net8.0\TestProject1.sourcelink.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\TestProject1\obj\project.assets.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\TestProject1\obj\project.packagespec.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\TestProject1\obj\TestProject1.csproj.nuget.dgspec.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\WorkshopManager.deps.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\WorkshopManager.runtimeconfig.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\WorkshopManager.staticwebassets.endpoints.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\bin\Debug\net8.0\WorkshopManager.staticwebassets.runtime.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\obj\Debug\net8.0\TestProject1.sourcelink.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\obj\project.assets.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\obj\project.packagespec.json" />
+    <_ContentIncludedByDefault Remove="TestProject1\obj\TestProject1.csproj.nuget.dgspec.json" />
+    <_ContentIncludedByDefault Remove="Workshopmanager.tests\obj\project.assets.json" />
+    <_ContentIncludedByDefault Remove="Workshopmanager.tests\obj\project.packagespec.json" />
+    <_ContentIncludedByDefault Remove="Workshopmanager.tests\obj\Workshopmanager.tests.csproj.nuget.dgspec.json" />
+    <_ContentIncludedByDefault Remove="kutas\bin\Debug\net8.0\kutas.deps.json" />
+    <_ContentIncludedByDefault Remove="kutas\obj\Debug\net8.0\kutas.sourcelink.json" />
+    <_ContentIncludedByDefault Remove="kutas\obj\kutas.csproj.nuget.dgspec.json" />
+    <_ContentIncludedByDefault Remove="kutas\obj\project.assets.json" />
+    <_ContentIncludedByDefault Remove="kutas\obj\project.packagespec.json" />
+    <_ContentIncludedByDefault Remove="ConsoleApp1\obj\ConsoleApp1.csproj.nuget.dgspec.json" />
+    <_ContentIncludedByDefault Remove="ConsoleApp1\obj\project.assets.json" />
+    <_ContentIncludedByDefault Remove="ConsoleApp1\obj\project.packagespec.json" />
   </ItemGroup>
 
 </Project>
