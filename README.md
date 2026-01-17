@@ -1,4 +1,4 @@
-# skibidi service zone (Warsztat Samochodowy)
+# Warsztat Samochodowy
 
 Aplikacja webowa ASP.NET Core MVC do zarządzania warsztatem samochodowym.
 
